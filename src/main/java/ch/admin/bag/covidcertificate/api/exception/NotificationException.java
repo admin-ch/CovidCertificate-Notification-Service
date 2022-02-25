@@ -4,10 +4,10 @@ import lombok.Getter;
 import org.springframework.core.NestedRuntimeException;
 
 @Getter
-public class ValueSetException extends NestedRuntimeException {
-    private final ValueSetError error;
+public class NotificationException extends NestedRuntimeException {
+    private final NotificationError error;
 
-    public ValueSetException(ValueSetError error) {
+    public NotificationException(NotificationError error) {
         super(error.getErrorMessage());
         this.error = error;
     }

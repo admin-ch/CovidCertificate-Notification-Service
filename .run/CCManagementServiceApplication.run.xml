@@ -8,7 +8,7 @@
                 <option name="ENABLED" value="true"/>
             </pattern>
         </extension>
-        <option name="SPRING_BOOT_MAIN_CLASS" value="ch.admin.bag.covidcertificate.CCManagementServiceApplication"/>
+        <option name="SPRING_BOOT_MAIN_CLASS" value="ch.admin.bag.covidcertificate.NotificationServiceApplication"/>
         <option name="ACTIVE_PROFILES"
                 value="local,mock-printing-service,mock-inapp-delivery-service,mock-value-sets-service,mock-signing-service"/>
         <option name="ALTERNATIVE_JRE_PATH"/>

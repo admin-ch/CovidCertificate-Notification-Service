@@ -18,9 +18,9 @@ public class ActuatorSecurity extends WebSecurityConfigurerAdapter {
 
     private static final String PROMETHEUS_ROLE = "PROMETHEUS";
 
-    @Value("${cc-management-service.monitor.prometheus.user}")
+    @Value("${cc-notification-service.monitor.prometheus.user}")
     private String user;
-    @Value("${cc-management-service.monitor.prometheus.password}")
+    @Value("${cc-notification-service.monitor.prometheus.password}")
     private String password;
 
     @Override

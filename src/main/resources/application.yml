@@ -97,7 +97,7 @@ spring:
   main:
     banner-mode: off
 
-management:
+notification:
   endpoints:
     web:
       exposure:

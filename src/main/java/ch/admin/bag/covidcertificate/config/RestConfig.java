@@ -21,10 +21,10 @@ import java.util.Base64;
 @Configuration
 public class RestConfig {
 
-    @Value("${cc-management-service.rest.connectTimeoutSeconds}")
+    @Value("${cc-notification-service.rest.connectTimeoutSeconds}")
     private int connectTimeout;
 
-    @Value("${cc-management-service.rest.readTimeoutSeconds}")
+    @Value("${cc-notification-service.rest.readTimeoutSeconds}")
     private int readTimeout;
 
     @Value("${app.conn.cc-signing-service.key-store}")

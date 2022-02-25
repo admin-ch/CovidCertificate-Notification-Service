@@ -9,9 +9,9 @@
         <relativePath/>
     </parent>
     <groupId>ch.admin.bag.covidcertificate</groupId>
-    <artifactId>cc-management-service</artifactId>
+    <artifactId>cc-notification-service</artifactId>
     <version>3.6.9</version>
-    <name>cc-management-service</name>
+    <name>cc-notification-service</name>
     <description>Service for generating Covid Certificates</description>
 
     <properties>
@@ -53,7 +53,7 @@
             **/*Dto.java,**/config/*,**/*Exception.java,**/*Constants.java,**/*Registry.java,**/*Config.java,**/*Mock*,**/*Application.java,**/*HttpResponseHeaderFilter.java,**/*ActuatorSecurity.java
         </sonar.coverage.exclusions>
 
-        <sonar.projectKey>admin-ch_CovidCertificate-Management-Service</sonar.projectKey>
+        <sonar.projectKey>admin-ch_CovidCertificate-Notification-Service</sonar.projectKey>
         <sonar.organization>admin-ch</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
 
@@ -328,7 +328,7 @@
     </dependencies>
 
     <build>
-        <finalName>cc-management-service</finalName>
+        <finalName>cc-notification-service</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

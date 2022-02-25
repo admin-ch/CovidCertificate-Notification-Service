@@ -3,9 +3,9 @@ spring:
     oauth2:
       client:
         registration:
-          cc-management-service:
-            client-id: "cc-management-service"
-            client-secret: ${vcap.services.cc-management-service-keycloak-client.credentials.client-secret}
+          cc-notification-service:
+            client-id: "cc-notification-service"
+            client-secret: ${vcap.services.cc-notification-service-keycloak-client.credentials.client-secret}
             authorization-grant-type: "client_credentials"
             provider: "default-provider"
             scope: "openid"
@@ -20,11 +20,11 @@ jeap:
         authorization-server:
           issuer: "https://identity-a.bit.admin.ch/realms/BAG-CovidCertificate"
 
-cc-management-service:
+cc-notification-service:
   cose:
     key-identifier: "24BC6B7B7BD2C328"
   jwt:
-    issuer: "https://covidcertificate-management-a.bag.admin.ch"
+    issuer: "https://covidcertificate-notification-a.bag.admin.ch"
     token-validity: 43200000
     privateKey: ${vcap.services.cc_jwt_signing_key.credentials.privateKey}
   cache-duration: 21600000
@@ -55,7 +55,7 @@ app:
     cc-signing-service:
       key-store: ${vcap.services.cc_signing_service_keystore.credentials.keystore}
       key-store-password: ${vcap.services.cc_signing_service_keystore.credentials.keystorePassword}
-      key-alias: cc-management-service
+      key-alias: cc-notification-service
       key-password: ${vcap.services.cc_signing_service_keystore.credentials.keyPassword}
       trust-store: ${vcap.services.cc_signing_service_keystore.credentials.keystore}
       trust-store-password: ${vcap.services.cc_signing_service_keystore.credentials.keystorePassword}

@@ -22,7 +22,7 @@ import java.util.List;
 @Configuration
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Value("${cc-management-service.allowed-origin}")
+    @Value("${cc-notification-service.allowed-origin}")
     private String allowedOrigin;
 
     @Override

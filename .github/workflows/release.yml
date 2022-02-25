@@ -39,4 +39,4 @@ jobs:
           prerelease: false
           automatic_release_tag: ${{ steps.current-time.outputs.formattedTime }}
           title: Release ${{ steps.current-time.outputs.formattedTime }}
-          files: target/cc-management-service.jar
+          files: target/cc-notification-service.jar

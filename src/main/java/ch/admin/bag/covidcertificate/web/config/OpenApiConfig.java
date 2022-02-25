@@ -15,8 +15,8 @@ public class OpenApiConfig {
         return new OpenAPI()
                 .components(new Components())
                 .info(new Info()
-                        .title("CC Management Service")
-                        .description("Rest API for CC Management Service.")
+                        .title("CC Notification Service")
+                        .description("Rest API for CC Notification Service.")
                         .version("0.0.1")
                         .license(new License().name("Apache 2.0"))
                 );

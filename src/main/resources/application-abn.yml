@@ -1,0 +1,61 @@
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          cc-management-service:
+            client-id: "cc-management-service"
+            client-secret: ${vcap.services.cc-management-service-keycloak-client.credentials.client-secret}
+            authorization-grant-type: "client_credentials"
+            provider: "default-provider"
+            scope: "openid"
+        provider:
+          default-provider:
+            issuer-uri: "https://identity-a.bit.admin.ch/realms/BAG-CovidCertificate"
+
+jeap:
+  security:
+    oauth2:
+      resourceserver:
+        authorization-server:
+          issuer: "https://identity-a.bit.admin.ch/realms/BAG-CovidCertificate"
+
+cc-management-service:
+  cose:
+    key-identifier: "24BC6B7B7BD2C328"
+  jwt:
+    issuer: "https://covidcertificate-management-a.bag.admin.ch"
+    token-validity: 43200000
+    privateKey: ${vcap.services.cc_jwt_signing_key.credentials.privateKey}
+  cache-duration: 21600000
+  monitor:
+    prometheus:
+      user: "prometheus"
+      password: ${vcap.services.cc_prometheus.credentials.password}
+
+  allowed-origin: "https://www.covidcertificate-a.admin.ch"
+
+cc-signing-service:
+  url: "https://covidcertificate-signing-a.bag.admin.ch/bag-vaccinecer-webapp/sign"
+  verify-url: "https://covidcertificate-signing-a.bag.admin.ch/bag-vaccinecer-webapp/sign/verify"
+  kid-url: "https://covidcertificate-signing-a.bag.admin.ch/bag-vaccinecer-webapp/sign/configuration/kid"
+
+cc-printing-service:
+  url: "https://cc-printing-service.abn.app.cfap02.atlantica.admin.ch/api/v1/print"
+
+cc-inapp-delivery-service:
+  url: "https://ch-covidcertificate-backend-delivery-ws.abn.app.cfap02.atlantica.admin.ch/cgs/delivery/v1/covidcert"
+
+ch-covidcertificate-backend-verifier-service:
+  url: "https://ch-covidcertificate-backend-verifier-ws.abn.app.cfap02.atlantica.admin.ch/dcga/v1/valueSets"
+
+## Mutual-SSL configuration
+app:
+  conn:
+    cc-signing-service:
+      key-store: ${vcap.services.cc_signing_service_keystore.credentials.keystore}
+      key-store-password: ${vcap.services.cc_signing_service_keystore.credentials.keystorePassword}
+      key-alias: cc-management-service
+      key-password: ${vcap.services.cc_signing_service_keystore.credentials.keyPassword}
+      trust-store: ${vcap.services.cc_signing_service_keystore.credentials.keystore}
+      trust-store-password: ${vcap.services.cc_signing_service_keystore.credentials.keystorePassword}

@@ -1,0 +1,10 @@
+version: '3'
+services:
+  db-cc-notification:
+    image: postgres
+    ports:
+      - "3123:5432"
+    environment:
+      - POSTGRES_USER=cc-notification
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=cc-notification

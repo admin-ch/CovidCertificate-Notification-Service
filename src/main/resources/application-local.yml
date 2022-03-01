@@ -14,7 +14,7 @@ spring:
           default-provider:
             issuer-uri: "http://localhost:8180"
 
-jeap:si
+jeap:
   security:
     oauth2:
       resourceserver:

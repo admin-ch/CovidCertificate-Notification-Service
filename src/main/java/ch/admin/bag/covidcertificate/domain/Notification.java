@@ -16,12 +16,12 @@ public class Notification {
     @GeneratedValue(strategy = GenerationType.AUTO)
     UUID id;
 
-    String messages;
+    String content;
 
     @Column(insertable = false)
     LocalDateTime creationDateTime;
 
-    public Notification(String messages) {
-        this.messages = messages;
+    public Notification(String content) {
+        this.content = content;
     }
 }

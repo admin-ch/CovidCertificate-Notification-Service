@@ -101,7 +101,7 @@ notification:
   endpoints:
     web:
       exposure:
-        include: 'info,health,prometheus,loggers'
+        include: 'info,health,loggers'
   endpoint:
     health:
       show-details: always
@@ -112,6 +112,3 @@ cc-notification-service:
   rest:
     connectTimeoutSeconds: 8
     readTimeoutSeconds: 8
-  monitor:
-    prometheus:
-      secure: false

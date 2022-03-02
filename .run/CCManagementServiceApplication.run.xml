@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
     <configuration default="false" name="CCNotificationServiceApplication" type="SpringBootApplicationConfigurationType"
                    factoryName="Spring Boot">
-        <module name="cc-notification-service"/>
+        <module name="CovidCertificate-Notification-Service"/>
         <extension name="coverage">
             <pattern>
                 <option name="PATTERN" value="ch.admin.bag.covidcertificate.*"/>

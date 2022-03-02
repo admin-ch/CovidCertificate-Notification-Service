@@ -8,7 +8,7 @@ import java.io.Serializable;
 
 @AllArgsConstructor
 @Getter
-public class ValueSetError implements Serializable {
+public class NotificationError implements Serializable {
     private final int errorCode;
     private final String errorMessage;
     private final HttpStatus httpStatus;

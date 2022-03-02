@@ -1,14 +1,22 @@
 package ch.admin.bag.covidcertificate.service;
 
+import ch.admin.bag.covidcertificate.api.Constants;
+import ch.admin.bag.covidcertificate.api.exception.NotificationException;
+import ch.admin.bag.covidcertificate.api.request.NotificationDto;
 import ch.admin.bag.covidcertificate.domain.Notification;
 import ch.admin.bag.covidcertificate.domain.NotificationRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -20,16 +28,37 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
 
     @Cacheable(NOTIFICATIONS_CACHE_NAME)
-    public Optional<Notification> readNotifications() {
+    public List<NotificationDto> readNotifications() {
         log.info("Read all notifications");
-        return this.notificationRepository.findAll().stream().findFirst();
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY, true);
+
+        var notification = this.notificationRepository.findAll().stream().findFirst();
+        if (notification.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        try {
+            NotificationDto[] notifications = mapper.readValue(notification.get().getContent(), NotificationDto[].class);
+            return Arrays.asList(notifications);
+        } catch (JsonProcessingException e) {
+            log.error(e.getMessage());
+            throw new NotificationException(Constants.NOTIFICATION_MAPPING_ERROR);
+        }
     }
 
     @CacheEvict(value = NOTIFICATIONS_CACHE_NAME, allEntries = true)
-    public void writeNotifications(String notifications) {
+    public void writeNotifications(List<NotificationDto> notifications) {
         log.info("Write notifications");
-        this.notificationRepository.deleteAll();
-        this.notificationRepository.save(new Notification(notifications));
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            String notificationsJson = mapper.writer().writeValueAsString(notifications);
+            this.notificationRepository.deleteAll();
+            this.notificationRepository.save(new Notification(notificationsJson));
+        } catch (JsonProcessingException e) {
+            log.error(e.getMessage());
+            throw new NotificationException(Constants.NOTIFICATION_MAPPING_ERROR);
+        }
     }
 
     @CacheEvict(value = NOTIFICATIONS_CACHE_NAME, allEntries = true)

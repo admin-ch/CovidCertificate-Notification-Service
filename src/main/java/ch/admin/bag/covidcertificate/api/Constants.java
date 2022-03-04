@@ -11,7 +11,19 @@ public class Constants {
     public static final String PREFERRED_USERNAME_CLAIM_KEY = "preferred_username";
 
     // Errors
-    public static final String NOTIFICATION_END_BEFORE_START_ERROR = "Start needs to be before end.";
-    public static final String NOTIFICATION_SAME_END_AND_START_TIME_ERROR = "Start and end time must not be the same.";
     public static final NotificationError NOTIFICATION_MAPPING_ERROR = new NotificationError(550, "Notification could not be mapped to DTO.", HttpStatus.INTERNAL_SERVER_ERROR);
+    public static final NotificationError NOTIFICATION_VALIDATION_ERROR = new NotificationError(551, "Notification is not valid.", HttpStatus.BAD_REQUEST);
+    public static final NotificationError NOTIFICATION_ALREADY_EXISTING_ERROR = new NotificationError(552, "There are already existing notifications which have to be removed first in order to write notifications.", HttpStatus.BAD_REQUEST);
+
+    // Error messages
+    public static final String MESSAGE_TYPE_MUST_NOT_BE_NULL = "Type must not be null.";
+    public static final String MESSAGE_MUST_NOT_BE_NULL = "Message must not be null.";
+    public static final String START_MUST_NOT_BE_NULL = "Start must not be null.";
+    public static final String END_MUST_NOT_BE_NULL = "End must not be null.";
+    public static final String START_HAS_TO_BE_BEFORE_END = "Start has to be before end.";
+    public static final String DE_MUST_NOT_BE_EMPTY = "de of message must not be empty.";
+    public static final String FR_MUST_NOT_BE_EMPTY = "fr of message must not be empty.";
+    public static final String IT_MUST_NOT_BE_EMPTY = "it of message must not be empty.";
+    public static final String EN_MUST_NOT_BE_EMPTY = "en of message must not be empty.";
+
 }

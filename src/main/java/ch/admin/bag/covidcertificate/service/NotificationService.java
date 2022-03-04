@@ -27,10 +27,11 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
 
+    private final ObjectMapper mapper;
+
     @Cacheable(NOTIFICATIONS_CACHE_NAME)
     public List<NotificationDto> readNotifications() {
         log.info("Read all notifications");
-        ObjectMapper mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY, true);
 
         var notification = this.notificationRepository.findAll().stream().findFirst();
@@ -50,10 +51,13 @@ public class NotificationService {
     @CacheEvict(value = NOTIFICATIONS_CACHE_NAME, allEntries = true)
     public void writeNotifications(List<NotificationDto> notifications) {
         log.info("Write notifications");
-        ObjectMapper mapper = new ObjectMapper();
+
+        if ((!this.notificationRepository.findAll().isEmpty())) {
+            throw new NotificationException(Constants.NOTIFICATION_ALREADY_EXISTING_ERROR);
+        }
+
         try {
             String notificationsJson = mapper.writer().writeValueAsString(notifications);
-            this.notificationRepository.deleteAll();
             this.notificationRepository.save(new Notification(notificationsJson));
         } catch (JsonProcessingException e) {
             log.error(e.getMessage());

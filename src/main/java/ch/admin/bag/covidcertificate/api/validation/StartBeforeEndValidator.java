@@ -26,8 +26,7 @@ public class StartBeforeEndValidator
                 .getPropertyValue(endField);
 
 
-        if (start == null && end == null) return true;
-        if ((start != null && end == null) || (start == null && end != null)) return false;
+        if (start == null || end == null) return true;
         return start.isBefore(end);
     }
 }

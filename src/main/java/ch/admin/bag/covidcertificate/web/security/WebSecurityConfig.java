@@ -32,11 +32,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/swagger-ui.html",
                         "/swagger-ui/**",
                         "/v3/api-docs/**",
-                        "/api/v1/revocation-list",
-                        "/api/v1/ping",
-                        "/api/v1/feature-toggle/features").
-                and().
-                authorizeRequests().anyRequest().permitAll();
+                        "/api/v1/ping")
+                .and()
+                .authorizeRequests().anyRequest().permitAll();
     }
 
     @Bean
@@ -49,5 +47,4 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-
 }

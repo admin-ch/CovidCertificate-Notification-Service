@@ -1,32 +1,6 @@
-spring:
-  security:
-    oauth2:
-      client:
-        registration:
-          cc-notification-service:
-            client-id: "cc-notification-service"
-            client-secret: ${vcap.services.cc-notification-service-keycloak-client.credentials.client-secret}
-            authorization-grant-type: "client_credentials"
-            provider: "default-provider"
-            scope: "openid"
-        provider:
-          default-provider:
-            issuer-uri: "https://identity.bit.admin.ch/realms/BAG-CovidCertificate"
-
-jeap:
-  security:
-    oauth2:
-      resourceserver:
-        authorization-server:
-          issuer: "https://identity.bit.admin.ch/realms/BAG-CovidCertificate"
-
 cc-notification-service:
   cose:
     key-identifier: "2E5DCD3F4DF33B16"
-  jwt:
-    issuer: "https://covidcertificate-notification.bag.admin.ch"
-    token-validity: 43200000
-    privateKey: ${vcap.services.cc_jwt_signing_key.credentials.privateKey}
   cache-duration: 21600000
   monitor:
     prometheus:

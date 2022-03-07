@@ -20,6 +20,7 @@ public class Constants {
     public static final String MESSAGE_MUST_NOT_BE_NULL = "Message must not be null.";
     public static final String START_MUST_NOT_BE_NULL = "Start must not be null.";
     public static final String END_MUST_NOT_BE_NULL = "End must not be null.";
+    public static final String END_MUST_NOT_BE_IN_PAST = "End must not be in the past.";
     public static final String START_HAS_TO_BE_BEFORE_END = "Start has to be before end.";
     public static final String DE_MUST_NOT_BE_EMPTY = "de of message must not be empty.";
     public static final String FR_MUST_NOT_BE_EMPTY = "fr of message must not be empty.";

@@ -1,5 +1,6 @@
 package ch.admin.bag.covidcertificate.web.controller;
 
+import ch.admin.bag.covidcertificate.api.Constants;
 import ch.admin.bag.covidcertificate.api.request.MessageDto;
 import ch.admin.bag.covidcertificate.api.request.MessageType;
 import ch.admin.bag.covidcertificate.api.request.NotificationDto;
@@ -50,7 +51,7 @@ class NotificationsControllerTest {
                 MessageType.INFO,
                 new MessageDto("de", "fr", "it", "en"),
                 LocalDateTime.now().minusHours(1),
-                LocalDateTime.now()
+                LocalDateTime.now().plusHours(1)
         );
     }
 
@@ -134,7 +135,7 @@ class NotificationsControllerTest {
 
         @ParameterizedTest
         @CsvFileSource(resources = "/csv/notifications_dto.csv", delimiter = 'þ')
-        void whenNoNotificationsIsNull_thenReturnBadRequest(String notifications, String expectedErrMsg) throws Exception {
+        void whenInvalidData_thenReturnBadRequest(String notifications, String expectedErrMsg) throws Exception {
             // given
             var request = post(URL)
                     .accept(MediaType.ALL_VALUE)
@@ -149,6 +150,26 @@ class NotificationsControllerTest {
             mockMvc.perform(request)
                     .andExpect(status().isBadRequest())
                     .andExpect(content().string(Matchers.containsString(expectedErrMsg)));
+
+        }
+
+        @Test
+        void whenEndIsInPast_thenReturnBadRequest() throws Exception {
+            validNotificationDto.setEnd(LocalDateTime.now().minusHours(1));
+            validNotificationDto.setStart(LocalDateTime.now().minusHours(2));
+            var notificationsStr = mapper.writeValueAsString(List.of(validNotificationDto));
+
+            // given
+            var request = post(URL)
+                    .accept(MediaType.ALL_VALUE)
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                    .content(notificationsStr)
+                    .header("Authorization", fixture.create(String.class));
+
+            // when then
+            mockMvc.perform(request)
+                    .andExpect(status().isBadRequest())
+                    .andExpect(content().string(Matchers.containsString(Constants.END_MUST_NOT_BE_IN_PAST)));
 
         }
 

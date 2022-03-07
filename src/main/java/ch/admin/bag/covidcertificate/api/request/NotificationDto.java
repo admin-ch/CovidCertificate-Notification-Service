@@ -1,5 +1,6 @@
 package ch.admin.bag.covidcertificate.api.request;
 
+import ch.admin.bag.covidcertificate.api.validation.NotInPast;
 import ch.admin.bag.covidcertificate.api.validation.StartBeforeEnd;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -43,5 +44,6 @@ public class NotificationDto {
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "UTC")
     @NotNull(message = END_MUST_NOT_BE_NULL)
+    @NotInPast(message = END_MUST_NOT_BE_IN_PAST)
     private LocalDateTime end;
 }

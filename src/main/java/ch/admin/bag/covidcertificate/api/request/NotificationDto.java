@@ -24,7 +24,7 @@ import static ch.admin.bag.covidcertificate.api.Constants.*;
 @Getter
 @Setter
 @Slf4j
-@StartBeforeEnd(startField = "start", endField = "end", message = START_HAS_TO_BE_BEFORE_END)
+@StartBeforeEnd(message = START_HAS_TO_BE_BEFORE_END)
 public class NotificationDto {
 
     @NotNull(message = MESSAGE_TYPE_MUST_NOT_BE_NULL)

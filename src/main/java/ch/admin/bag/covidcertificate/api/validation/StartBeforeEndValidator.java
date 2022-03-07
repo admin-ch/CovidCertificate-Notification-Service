@@ -1,30 +1,21 @@
 package ch.admin.bag.covidcertificate.api.validation;
 
-import org.springframework.beans.BeanWrapperImpl;
+import ch.admin.bag.covidcertificate.api.request.NotificationDto;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import java.time.LocalDateTime;
 
 public class StartBeforeEndValidator
-        implements ConstraintValidator<StartBeforeEnd, Object> {
-
-    private String startField;
-    private String endField;
+        implements ConstraintValidator<StartBeforeEnd, NotificationDto> {
 
     public void initialize(StartBeforeEnd constraintAnnotation) {
-        this.startField = constraintAnnotation.startField();
-        this.endField = constraintAnnotation.endField();
     }
 
-    public boolean isValid(Object value,
+    public boolean isValid(NotificationDto value,
                            ConstraintValidatorContext context) {
 
-        LocalDateTime start = (LocalDateTime) new BeanWrapperImpl(value)
-                .getPropertyValue(startField);
-        LocalDateTime end = (LocalDateTime) new BeanWrapperImpl(value)
-                .getPropertyValue(endField);
-
+        var start = value.getStart();
+        var end = value.getEnd();
 
         if (start == null || end == null) return true;
         return start.isBefore(end);

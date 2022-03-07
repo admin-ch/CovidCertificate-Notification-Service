@@ -17,9 +17,4 @@ public @interface StartBeforeEnd {
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
-
-    String startField();
-
-    String endField();
-
 }

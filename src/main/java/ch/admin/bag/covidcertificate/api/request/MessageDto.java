@@ -6,7 +6,10 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotEmpty;
 
-import static ch.admin.bag.covidcertificate.api.Constants.*;
+import static ch.admin.bag.covidcertificate.api.Constants.DE_MUST_NOT_BE_EMPTY;
+import static ch.admin.bag.covidcertificate.api.Constants.EN_MUST_NOT_BE_EMPTY;
+import static ch.admin.bag.covidcertificate.api.Constants.FR_MUST_NOT_BE_EMPTY;
+import static ch.admin.bag.covidcertificate.api.Constants.IT_MUST_NOT_BE_EMPTY;
 
 @AllArgsConstructor
 @NoArgsConstructor

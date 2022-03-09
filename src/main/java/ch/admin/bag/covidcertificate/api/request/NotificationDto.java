@@ -17,7 +17,12 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
-import static ch.admin.bag.covidcertificate.api.Constants.*;
+import static ch.admin.bag.covidcertificate.api.Constants.END_MUST_NOT_BE_IN_PAST;
+import static ch.admin.bag.covidcertificate.api.Constants.END_MUST_NOT_BE_NULL;
+import static ch.admin.bag.covidcertificate.api.Constants.MESSAGE_MUST_NOT_BE_NULL;
+import static ch.admin.bag.covidcertificate.api.Constants.MESSAGE_TYPE_MUST_NOT_BE_NULL;
+import static ch.admin.bag.covidcertificate.api.Constants.START_HAS_TO_BE_BEFORE_END;
+import static ch.admin.bag.covidcertificate.api.Constants.START_MUST_NOT_BE_NULL;
 
 @AllArgsConstructor
 @NoArgsConstructor

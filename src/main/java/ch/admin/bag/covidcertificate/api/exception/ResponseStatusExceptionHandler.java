@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -26,6 +27,11 @@ public class ResponseStatusExceptionHandler {
             message = "Validation failed: " + violation.get().getMessage();
         }
         return new ResponseEntity<>(new NotificationError(551, message, HttpStatus.BAD_REQUEST), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(value = {AccessDeniedException.class, SecurityException.class})
+    protected ResponseEntity<Object> handleAccessDeniedException() {
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(value = {HttpMessageNotReadableException.class})

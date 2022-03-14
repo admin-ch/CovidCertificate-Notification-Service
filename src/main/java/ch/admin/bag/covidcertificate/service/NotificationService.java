@@ -52,7 +52,7 @@ public class NotificationService {
     public void writeNotifications(List<NotificationDto> notifications) {
         log.info("Write notifications");
 
-        if ((!this.notificationRepository.findAll().isEmpty())) {
+        if (this.notificationRepository.count() > 0) {
             throw new NotificationException(Constants.NOTIFICATION_ALREADY_EXISTING_ERROR);
         }
 

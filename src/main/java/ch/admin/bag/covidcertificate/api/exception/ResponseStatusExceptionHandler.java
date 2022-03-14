@@ -22,7 +22,7 @@ public class ResponseStatusExceptionHandler {
     @ExceptionHandler(value = {ConstraintViolationException.class})
     protected ResponseEntity<Object> validationException(ConstraintViolationException e) {
         var violation = e.getConstraintViolations().stream().findFirst();
-        var message = "";
+        var message = "Validation failed.";
         if (violation.isPresent()) {
             message = "Validation failed: " + violation.get().getMessage();
         }

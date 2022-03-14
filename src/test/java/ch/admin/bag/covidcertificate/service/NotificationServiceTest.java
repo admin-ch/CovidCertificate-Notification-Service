@@ -124,13 +124,13 @@ class NotificationServiceTest {
 
         @BeforeEach
         void beforeEach() {
-            when(notificationRepository.findAll()).thenReturn(List.of());
+            when(notificationRepository.count()).thenReturn(0L);
         }
 
         @Test
         void whenNotificationsPresent_thenThrowNotificationException() {
             // given
-            when(notificationRepository.findAll()).thenReturn(List.of(notification));
+            when(notificationRepository.count()).thenReturn(1L);
 
             // when then
             var e = assertThrows(NotificationException.class, () -> notificationService.writeNotifications(List.of(notificationDto)));
@@ -140,7 +140,6 @@ class NotificationServiceTest {
         @Test
         void whenNoNotificationsPresent_thenSaveNotification() throws JsonProcessingException {
             // given
-            when(notificationRepository.findAll()).thenReturn(Collections.emptyList());
             when(mapper.writer().writeValueAsString(any())).thenReturn(notificationJsonStr);
 
             // when

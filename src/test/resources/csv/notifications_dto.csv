@@ -9,6 +9,7 @@ nullþMalformed Request
 [{ "type": "INFO", "message": { "de": "Deutsch", "fr": "Francais", "en": "English" }, "start": "2098-03-09 11:30", "end": "2098-03-09 11:31"}]þit of message must not be empty.
 [{ "type": "INFO", "message": { "de": "Deutsch", "fr": "Francais", "it": "Italiano" }, "start": "2098-03-09 11:30", "end": "2098-03-09 11:31"}]þen of message must not be empty.
 [{ "type": "INFO", "message": { "de": "", "fr": "Francais", "it": "Italiano", "en": "English" }, "start": "2098-03-09 11:30", "end": "2098-03-09 11:31"}]þde of message must not be empty.
+[{ "type": "INFO", "message": { "de": "   ", "fr": "Francais", "it": "Italiano", "en": "English" }, "start": "2098-03-09 11:30", "end": "2098-03-09 11:31"}]þde of message must not be empty.
 [{ "type": "INFO", "message": { "de": "Deutsch", "fr": "", "it": "Italiano", "en": "English" }, "start": "2098-03-09 11:30", "end": "2098-03-09 11:31"}]þfr of message must not be empty.
 [{ "type": "INFO", "message": { "de": "Deutsch", "fr": "Francais", "it": "", "en": "English" }, "start": "2098-03-09 11:30", "end": "2098-03-09 11:31"}]þit of message must not be empty.
 [{ "type": "INFO", "message": { "de": "Deutsch", "fr": "Francais", "it": "Italiano", "en": "" }, "start": "2098-03-09 11:30", "end": "2098-03-09 11:31"}]þen of message must not be empty.

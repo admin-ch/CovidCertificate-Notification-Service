@@ -8,9 +8,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.Valid;
@@ -26,8 +25,7 @@ import static ch.admin.bag.covidcertificate.api.Constants.START_MUST_NOT_BE_NULL
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
+@Data
 @Slf4j
 @StartBeforeEnd(message = START_HAS_TO_BE_BEFORE_END)
 public class NotificationDto {

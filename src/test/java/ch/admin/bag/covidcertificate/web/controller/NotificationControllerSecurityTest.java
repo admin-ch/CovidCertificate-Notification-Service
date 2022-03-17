@@ -71,9 +71,6 @@ class NotificationControllerSecurityTest {
 
     @BeforeAll
     private static void setup() throws Exception {
-//        customizeIssuableVaccineDto(fixture);
-//        customizeTestValueSet(fixture);
-//        customizeCountryCode(fixture);
 
         wireMockServer.start();
         wireMockServer.stubFor(WireMock.get(urlPathEqualTo("/.well-known/jwks.json")).willReturn(aResponse()

@@ -21,13 +21,9 @@ jeap:
           issuer: "https://identity-a.bit.admin.ch/realms/BAG-CovidCertificate"
 
 cc-notification-service:
-  cose:
-    key-identifier: "24BC6B7B7BD2C328"
-  jwt:
-    issuer: "https://covidcertificate-notification-a.bag.admin.ch"
-    token-validity: 43200000
-    privateKey: ${vcap.services.cc_jwt_signing_key.credentials.privateKey}
   cache-duration: 21600000
+
+  # TODO: Muss noch angefordert werden.
   monitor:
     prometheus:
       user: "prometheus"

@@ -12,8 +12,7 @@ public class Constants {
 
     // Errors
     public static final NotificationError NOTIFICATION_MAPPING_ERROR = new NotificationError(550, "Notification could not be mapped to DTO.", HttpStatus.INTERNAL_SERVER_ERROR);
-    public static final NotificationError NOTIFICATION_VALIDATION_ERROR = new NotificationError(551, "Notification is not valid.", HttpStatus.BAD_REQUEST);
-    public static final NotificationError NOTIFICATION_ALREADY_EXISTING_ERROR = new NotificationError(552, "There are already existing notifications which have to be removed first in order to write notifications.", HttpStatus.BAD_REQUEST);
+    public static final NotificationError NOTIFICATION_ALREADY_EXISTING_ERROR = new NotificationError(461, "There are already existing notifications which have to be removed first in order to write notifications.", HttpStatus.BAD_REQUEST);
 
     // Error messages
     public static final String MESSAGE_TYPE_MUST_NOT_BE_NULL = "Type must not be null.";

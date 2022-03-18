@@ -26,7 +26,7 @@ public class ResponseStatusExceptionHandler {
         if (violation.isPresent()) {
             message = "Validation failed: " + violation.get().getMessage();
         }
-        return new ResponseEntity<>(new NotificationError(551, message, HttpStatus.BAD_REQUEST), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new NotificationError(460, message, HttpStatus.BAD_REQUEST), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(value = {AccessDeniedException.class, SecurityException.class})
@@ -36,7 +36,7 @@ public class ResponseStatusExceptionHandler {
 
     @ExceptionHandler(value = {HttpMessageNotReadableException.class})
     protected ResponseEntity<Object> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
-        return new ResponseEntity<>("Malformed Request", HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new NotificationError(462, "Malformed Request.", HttpStatus.BAD_REQUEST), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(value = {Exception.class})

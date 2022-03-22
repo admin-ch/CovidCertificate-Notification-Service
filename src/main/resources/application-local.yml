@@ -23,7 +23,6 @@ jeap:
           jwk-set-uri: "http://localhost:8180/.well-known/jwks.json"
 
 cc-notification-service:
-  cache-duration: 21600000
   monitor:
     prometheus:
       user: "prometheus"

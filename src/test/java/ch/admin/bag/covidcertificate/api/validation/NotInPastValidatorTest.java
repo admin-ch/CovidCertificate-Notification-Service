@@ -13,7 +13,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class NotInPastValidatorTest {
     private final NotInPastValidator validator = new NotInPastValidator();
-    private final LocalDateTime now = LocalDateTime.now();
 
     @BeforeEach
     public void beforeEach() {

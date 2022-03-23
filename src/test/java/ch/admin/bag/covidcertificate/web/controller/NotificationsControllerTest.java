@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flextrade.jfixture.JFixture;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -43,6 +44,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(value = {NotificationsController.class})
 @AutoConfigureMockMvc(addFilters = false)
 @WithMockUser(roles = {"bag-cc-superuser"})
+@DisplayName("Tests for NotificationsController")
 class NotificationsControllerTest {
     @MockBean
     private NotificationService notificationService;
@@ -70,9 +72,11 @@ class NotificationsControllerTest {
     }
 
     @Nested
+    @DisplayName("Tests for get")
     class GetAllNotificationsTest {
         @Test
-        void whenCalled_thenCallAuthorize() throws Exception {
+        @DisplayName("When called, it should authorize the user")
+        void GetTest1() throws Exception {
             // given
             List<NotificationDto> notifications = Collections.emptyList();
             when(notificationService.readNotifications()).thenReturn(notifications);
@@ -88,7 +92,8 @@ class NotificationsControllerTest {
         }
 
         @Test
-        void whenNoNotificationsPresent_thenReturnStatusNoContent() throws Exception {
+        @DisplayName("Given no notifications are present, when called, it should return 204 No Content")
+        void GetTest2() throws Exception {
             // given
             List<NotificationDto> notifications = Collections.emptyList();
 
@@ -105,7 +110,8 @@ class NotificationsControllerTest {
         }
 
         @Test
-        void whenNoNotificationsPresent_thenReturnStatusOk() throws Exception {
+        @DisplayName("Given notifications are present, when called, it should return 200 OK")
+        void GetTest3() throws Exception {
             // given
             var notifications = List.of(new NotificationDto());
 
@@ -122,7 +128,8 @@ class NotificationsControllerTest {
         }
 
         @Test
-        void whenNoNotificationsPresent_thenReturnNotifications() throws Exception {
+        @DisplayName("Given notifications are present, when called, it should return the notifications")
+        void GetTest4() throws Exception {
             // given
             var notifications = List.of(new NotificationDto());
 
@@ -139,6 +146,7 @@ class NotificationsControllerTest {
     }
 
     @Nested
+    @DisplayName("Tests for post")
     class WriteNotificationsTest {
 
         @BeforeEach
@@ -147,7 +155,8 @@ class NotificationsControllerTest {
         }
 
         @Test
-        void whenCalled_thenCallAuthorize() throws Exception {
+        @DisplayName("When called, it should authorize the user")
+        void PostTest1() throws Exception {
             // given
             var notifications = List.of(validNotificationDto);
             var notificationsStr = mapper.writeValueAsString(notifications);
@@ -164,7 +173,8 @@ class NotificationsControllerTest {
         }
 
         @Test
-        void whenNoNotificationsValid_thenReturnStatusCreated() throws Exception {
+        @DisplayName("Given notifications are valid, when called, it should return status 201 Created")
+        void PostTest2() throws Exception {
             // given
             var notifications = List.of(validNotificationDto);
             var notificationsStr = mapper.writeValueAsString(notifications);
@@ -182,7 +192,8 @@ class NotificationsControllerTest {
 
         @ParameterizedTest
         @CsvFileSource(resources = "/csv/notifications_dto.csv", delimiter = 'þ')
-        void whenInvalidData_thenReturnBadRequest(String notifications, String expectedErrMsg) throws Exception {
+        @DisplayName("Given notifications are invalid, when called, it should return status 400 Bad Request")
+        void PostTest3(String notifications, String expectedErrMsg) throws Exception {
             // given
             var request = post(URL)
                     .accept(MediaType.ALL_VALUE)
@@ -201,7 +212,8 @@ class NotificationsControllerTest {
         }
 
         @Test
-        void whenEndIsInPast_thenReturnBadRequest() throws Exception {
+        @DisplayName("Given 'end' is in past, when called, it should return status 400 Bad Request")
+        void PostTest4() throws Exception {
             validNotificationDto.setEnd(LocalDateTime.now().minusHours(1));
             validNotificationDto.setStart(LocalDateTime.now().minusHours(2));
             var notificationsStr = mapper.writeValueAsString(List.of(validNotificationDto));
@@ -223,6 +235,7 @@ class NotificationsControllerTest {
     }
 
     @Nested
+    @DisplayName("Tests for delete")
     class RemoveNotificationsTest {
 
         @BeforeEach
@@ -231,7 +244,8 @@ class NotificationsControllerTest {
         }
 
         @Test
-        void whenCalled_thenCallAuthorize() throws Exception {
+        @DisplayName("When called, it should authorize the user")
+        void DeleteTest1() throws Exception {
             // given
             var notifications = List.of(validNotificationDto);
             var notificationsStr = mapper.writeValueAsString(notifications);
@@ -247,7 +261,8 @@ class NotificationsControllerTest {
         }
 
         @Test
-        void whenNoNotificationsValid_thenReturnStatusCreated() throws Exception {
+        @DisplayName("Given notifications are valid, when called, it should return 201 Created")
+        void DeleteTest2() throws Exception {
             // when then
             mockMvc.perform(delete(URL)
                             .accept(MediaType.ALL_VALUE)

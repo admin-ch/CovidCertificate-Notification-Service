@@ -2,6 +2,7 @@ package ch.admin.bag.covidcertificate.api.validation;
 
 import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@DisplayName("Tests for NotInPastValidator")
 class NotInPastValidatorTest {
     private final NotInPastValidator validator = new NotInPastValidator();
 
@@ -21,7 +23,8 @@ class NotInPastValidatorTest {
     }
 
     @Test
-    public void ifDateIsNull_thenReturnTrue() {
+    @DisplayName("Given date is 'null', when validated, it should return 'true'")
+    public void validateTest1() {
         // given
         LocalDateTime date = null;
 
@@ -33,7 +36,8 @@ class NotInPastValidatorTest {
     }
 
     @Test
-    public void ifDateIsBarelyInTheFuture_thenReturnTrue() {
+    @DisplayName("Given date is barely in the future, when validated, it should return 'true'")
+    public void validateTest2() {
         // given
         LocalDateTime date = LocalDateTime.now().plusSeconds(1);
 
@@ -45,7 +49,8 @@ class NotInPastValidatorTest {
     }
 
     @Test
-    void ifDateIsNow_thenReturnFalse() {
+    @DisplayName("Given date is now, when validated, it should return 'true'")
+    void validateTest3() {
 
         // given
         LocalDateTime currentLocalDate = LocalDateTime.of(2022, 2, 2, 0, 0, 0, 0);
@@ -61,7 +66,8 @@ class NotInPastValidatorTest {
     }
 
     @Test
-    public void ifDateIsLongInTheFuture_thenReturnTrue() {
+    @DisplayName("Given date is long in the future, when validated, it should return 'true'")
+    public void validateTest4() {
         // given
         LocalDateTime date = LocalDateTime.now().plusYears(1);
 
@@ -73,7 +79,8 @@ class NotInPastValidatorTest {
     }
 
     @Test
-    public void ifDateIsBarelyInPast_thenReturnFalse() {
+    @DisplayName("Given date is barely in past, when validated, it should return 'false'")
+    public void validateTest5() {
         // given
         LocalDateTime date = LocalDateTime.now().minusSeconds(1);
 
@@ -85,7 +92,8 @@ class NotInPastValidatorTest {
     }
 
     @Test
-    public void ifDateIsLongInPast_thenReturnFalse() {
+    @DisplayName("Given date is long in past, when validated, it should return 'false'")
+    public void validateTest6() {
         // given
         LocalDateTime date = LocalDateTime.now().minusYears(1);
 

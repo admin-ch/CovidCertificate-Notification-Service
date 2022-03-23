@@ -9,6 +9,7 @@ import ch.admin.bag.covidcertificate.domain.NotificationRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,6 +41,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @RunWith(MockitoJUnitRunner.class)
+@DisplayName("Tests for NotificationService")
 class NotificationServiceTest {
 
     @InjectMocks
@@ -76,6 +78,7 @@ class NotificationServiceTest {
     }
 
     @Nested
+    @DisplayName("Tests for readNotification")
     public class ReadNotificationsTest {
 
         @BeforeEach
@@ -85,7 +88,8 @@ class NotificationServiceTest {
 
 
         @Test
-        void whenNoNotificationsPresent_thenReturnEmptyList() {
+        @DisplayName("Given no notifications are present, when called, it should return an empty collection")
+        void readNotificationTest1() {
             // given
             when(notificationRepository.findAll()).thenReturn(Collections.emptyList());
 
@@ -97,7 +101,8 @@ class NotificationServiceTest {
         }
 
         @Test
-        void whenNotificationsPresent_thenReturnListOfNotificationDto() throws JsonProcessingException {
+        @DisplayName("Given notifications are present, when called, it should return the list of NotificationDto")
+        void readNotificationTest2() throws JsonProcessingException {
             // given
             when(mapper.readValue(anyString(), ArgumentMatchers.<Class<NotificationDto[]>>any())).thenReturn(new NotificationDto[]{notificationDto});
 
@@ -109,7 +114,8 @@ class NotificationServiceTest {
         }
 
         @Test
-        void whenMappingFails_thenThrowNotificationException() throws JsonProcessingException {
+        @DisplayName("Given JSON mapping fails, when called, it should throw NotificationException")
+        void readNotificationTest3() throws JsonProcessingException {
             // given
             when(mapper.readValue(anyString(), ArgumentMatchers.<Class<Notification[]>>any())).thenThrow(JsonProcessingException.class);
 
@@ -120,6 +126,7 @@ class NotificationServiceTest {
     }
 
     @Nested
+    @DisplayName("Tests for writeNotification")
     public class WriteNotificationsTest {
 
         @BeforeEach
@@ -128,7 +135,8 @@ class NotificationServiceTest {
         }
 
         @Test
-        void whenNotificationsPresent_thenThrowNotificationException() {
+        @DisplayName("Given notifications are present, when called, it should throw NotificationException")
+        void writeNotificationTest1() {
             // given
             when(notificationRepository.count()).thenReturn(1L);
 
@@ -138,7 +146,8 @@ class NotificationServiceTest {
         }
 
         @Test
-        void whenNoNotificationsPresent_thenSaveNotification() throws JsonProcessingException {
+        @DisplayName("Given no notifications are present, when called, it should save the notifications")
+        void writeNotificationTest2() throws JsonProcessingException {
             // given
             when(mapper.writer().writeValueAsString(any())).thenReturn(notificationJsonStr);
 
@@ -150,7 +159,8 @@ class NotificationServiceTest {
         }
 
         @Test
-        void whenMappingFails_thenThrowNotificationException() throws JsonProcessingException {
+        @DisplayName("Given JSON mapping fails, when called, it should throw NotificationException")
+        void writeNotificationTest3() throws JsonProcessingException {
             // given
             when(mapper.writer().writeValueAsString(any())).thenThrow(JsonProcessingException.class);
 
@@ -161,10 +171,12 @@ class NotificationServiceTest {
     }
 
     @Nested
+    @DisplayName("Tests for removeNotification")
     public class RemoveNotificationsTest {
 
         @Test
-        void whenCalled_thenNotificationsAreDeleted() {
+        @DisplayName("When called, it should delete the notification")
+        void removeNotificationTest1() {
             // given
             doNothing().when(notificationRepository).deleteAll();
 

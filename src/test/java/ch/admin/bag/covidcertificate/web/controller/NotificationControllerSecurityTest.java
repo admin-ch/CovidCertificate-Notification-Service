@@ -15,6 +15,7 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -45,6 +46,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(value = {NotificationsController.class, OAuth2SecuredWebConfiguration.class})
 @ActiveProfiles("test")
+@DisplayName("Tests for NotificationControllerSecurity")
 class NotificationControllerSecurityTest {
     @MockBean
     private SecurityHelper securityHelper;
@@ -197,6 +199,7 @@ class NotificationControllerSecurityTest {
     }
 
     @Nested
+    @DisplayName("Tests for readNotification")
     class ReadNotificationsTest {
 
         private final List<NotificationDto> notifications = List.of(new NotificationDto());
@@ -207,7 +210,8 @@ class NotificationControllerSecurityTest {
         }
 
         @Test
-        void whenUnauthenticated_thenReturn401Unauthorized() throws Exception {
+        @DisplayName("Given user is unauthenticated, when called, it should return 401 Unauthorized")
+        void readNotificationTest1() throws Exception {
             mockMvc.perform(get(URL)
                             .contentType(MediaType.APPLICATION_JSON_VALUE)
                             .header("Authorization", "Bearer"))
@@ -216,19 +220,22 @@ class NotificationControllerSecurityTest {
         }
 
         @Test
-        void whenInvalidUserRole_thenReturn403Forbidden() throws Exception {
+        @DisplayName("Given user has invalid role, when called, it should return 403 Forbidden")
+        void readNotificationTest2() throws Exception {
             performGet(EXPIRED_IN_FUTURE, INVALID_USER_ROLE, HttpStatus.FORBIDDEN);
             Mockito.verify(notificationService, times(0)).readNotifications();
         }
 
         @Test
-        void whenAuthTokenExpired_thenReturn401Unauthorized() throws Exception {
+        @DisplayName("Given auth token is expired, when called, it should return 401 Unauthorized")
+        void readNotificationTest3() throws Exception {
             performGet(EXPIRED_IN_PAST, VALID_USER_ROLE, HttpStatus.UNAUTHORIZED);
             Mockito.verify(notificationService, times(0)).readNotifications();
         }
 
         @Test
-        void whenAuthorized_thenReturnNotifications() throws Exception {
+        @DisplayName("Given user authorized, when called, it should return the notifications")
+        void readNotificationTest4() throws Exception {
             performGet(EXPIRED_IN_FUTURE, VALID_USER_ROLE, HttpStatus.OK);
             Mockito.verify(notificationService, times(1)).readNotifications();
         }
@@ -245,6 +252,7 @@ class NotificationControllerSecurityTest {
     }
 
     @Nested
+    @DisplayName("Tests for writeNotification")
     class WriteNotificationsTest {
 
         private final List<NotificationDto> notifications = List.of(new NotificationDto(MessageType.INFO, new MessageDto("de", "fr", "it", "en"), LocalDateTime.now().minusHours(1), LocalDateTime.now().plusHours(1)));
@@ -255,7 +263,8 @@ class NotificationControllerSecurityTest {
         }
 
         @Test
-        void whenUnauthenticated_thenReturn403Forbidden() throws Exception {
+        @DisplayName("Given user is unauthenticated, when called, it should return 403 Forbidden")
+        void writeNotificationTest1() throws Exception {
 
             mockMvc.perform(MockMvcRequestBuilders.post(URL)
                             .accept(MediaType.ALL_VALUE)
@@ -267,19 +276,22 @@ class NotificationControllerSecurityTest {
         }
 
         @Test
-        void whenInvalidUserRole_thenReturn403Forbidden() throws Exception {
+        @DisplayName("Given user has invalid role, when called, it should return 403 Forbidden")
+        void writeNotificationTest2() throws Exception {
             performPost(EXPIRED_IN_FUTURE, INVALID_USER_ROLE, HttpStatus.FORBIDDEN);
             Mockito.verify(notificationService, times(0)).writeNotifications(any());
         }
 
         @Test
-        void whenAuthTokenExpired_thenReturn401Unauthorized() throws Exception {
+        @DisplayName("Given auth token is expired, when called, it should return 401 Unauthorized")
+        void writeNotificationTest3() throws Exception {
             performPost(EXPIRED_IN_PAST, VALID_USER_ROLE, HttpStatus.UNAUTHORIZED);
             Mockito.verify(notificationService, times(0)).writeNotifications(any());
         }
 
         @Test
-        void whenAuthorized_thenReturnCreated() throws Exception {
+        @DisplayName("Given user is authorized, when called, it should return 201 Created")
+        void writeNotificationTest4() throws Exception {
             performPost(EXPIRED_IN_FUTURE, VALID_USER_ROLE, HttpStatus.CREATED);
             Mockito.verify(notificationService, times(1)).writeNotifications(any());
         }
@@ -297,6 +309,7 @@ class NotificationControllerSecurityTest {
     }
 
     @Nested
+    @DisplayName("Tests for removeNotification")
     class RemoveNotificationsTest {
 
         private final List<NotificationDto> notifications = List.of(new NotificationDto());
@@ -307,7 +320,8 @@ class NotificationControllerSecurityTest {
         }
 
         @Test
-        void whenUnauthenticated_thenReturn403Forbidden() throws Exception {
+        @DisplayName("Given user is unauthenticated, when called, it should return 403 Forbidden")
+        void removeNotificationTest1() throws Exception {
             mockMvc.perform(delete(URL)
                             .contentType(MediaType.APPLICATION_JSON_VALUE)
                             .header("Authorization", "Bearer"))
@@ -316,19 +330,22 @@ class NotificationControllerSecurityTest {
         }
 
         @Test
-        void whenInvalidUserRole_thenReturn403Forbidden() throws Exception {
+        @DisplayName("Given user has invalid role, when called, it should return 403 Forbidden")
+        void removeNotificationTest2() throws Exception {
             performDelete(EXPIRED_IN_FUTURE, INVALID_USER_ROLE, HttpStatus.FORBIDDEN);
             Mockito.verify(notificationService, times(0)).removeNotifications();
         }
 
         @Test
-        void whenAuthTokenExpired_thenReturn401Unauthorized() throws Exception {
+        @DisplayName("Given auth token is expired, when called, it should return 401 Unauthorized")
+        void removeNotificationTest3() throws Exception {
             performDelete(EXPIRED_IN_PAST, VALID_USER_ROLE, HttpStatus.UNAUTHORIZED);
             Mockito.verify(notificationService, times(0)).removeNotifications();
         }
 
         @Test
-        void whenAuthorized_thenReturnNoContent() throws Exception {
+        @DisplayName("Given user is authorized, when called, it should return 204 No Content")
+        void removeNotificationTest4() throws Exception {
             performDelete(EXPIRED_IN_FUTURE, VALID_USER_ROLE, HttpStatus.NO_CONTENT);
             Mockito.verify(notificationService, times(1)).removeNotifications();
         }

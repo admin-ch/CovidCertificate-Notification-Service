@@ -3,6 +3,8 @@ package ch.admin.bag.covidcertificate.api.validation;
 import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 import java.time.LocalDateTime;
 
@@ -41,6 +43,22 @@ class NotInPastValidatorTest {
 
         // then
         assertTrue(result);
+    }
+
+    @Test
+    void ifDateIsNow_thenReturnFalse() {
+
+        // given
+        LocalDateTime currentLocalDate = LocalDateTime.of(2022, 2, 2, 0, 0, 0, 0);
+        try (MockedStatic<LocalDateTime> topDateTimeUtilMock = Mockito.mockStatic(LocalDateTime.class)) {
+            topDateTimeUtilMock.when(() -> LocalDateTime.now()).thenReturn(currentLocalDate);
+
+            // when
+            var result = validator.isValid(currentLocalDate, null);
+
+            // then
+            assertFalse(result);
+        }
     }
 
     @Test

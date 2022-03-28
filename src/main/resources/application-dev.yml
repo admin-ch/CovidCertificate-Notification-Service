@@ -1,18 +1,3 @@
-spring:
-  security:
-    oauth2:
-      client:
-        registration:
-          cc-management-service:
-            client-id: "cc-management-service"
-            client-secret: ${vcap.services.cc-management-service-keycloak-client.credentials.client-secret}
-            authorization-grant-type: "client_credentials"
-            provider: "default-provider"
-            scope: "openid"
-        provider:
-          default-provider:
-            issuer-uri: "https://identity-r.bit.admin.ch/realms/BAG-CovidCertificate"
-
 jeap:
   security:
     oauth2:
@@ -21,4 +6,10 @@ jeap:
           issuer: "https://identity-r.bit.admin.ch/realms/BAG-CovidCertificate"
 
 cc-notification-service:
+  # TODO: Muss noch angefordert werden.
+  monitor:
+    prometheus:
+      user: "prometheus"
+      password: ${vcap.services.cc_prometheus.credentials.password}
+
   allowed-origin: "https://www.covidcertificate-d.admin.ch"

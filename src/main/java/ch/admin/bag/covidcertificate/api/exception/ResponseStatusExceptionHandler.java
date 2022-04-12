@@ -14,6 +14,13 @@ import javax.validation.ConstraintViolationException;
 @Slf4j
 public class ResponseStatusExceptionHandler {
 
+    @ExceptionHandler(value = {AuthorizationException.class})
+    protected ResponseEntity<Object> handleAuthorizationException(AuthorizationException e) {
+        log.error(e.getMessage());
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
+    }
+
+
     @ExceptionHandler(value = {NotificationException.class})
     protected ResponseEntity<Object> notificationException(NotificationException ex) {
         return new ResponseEntity<>(ex.getError(), ex.getError().getHttpStatus());

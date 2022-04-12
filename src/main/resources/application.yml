@@ -112,3 +112,10 @@ cc-notification-service:
   rest:
     connectTimeoutSeconds: 8
     readTimeoutSeconds: 8
+
+cc-management-service:
+  authorization:
+    api:
+      v1-path: "api/v1/authorization/"
+    data-sync:
+      cron: "0 0 0 * * *" ## Every day at midnight

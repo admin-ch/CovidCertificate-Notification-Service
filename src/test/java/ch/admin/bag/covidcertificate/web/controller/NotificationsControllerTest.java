@@ -6,6 +6,7 @@ import ch.admin.bag.covidcertificate.api.request.MessageType;
 import ch.admin.bag.covidcertificate.api.request.NotificationDto;
 import ch.admin.bag.covidcertificate.config.security.OAuth2SecuredWebConfiguration;
 import ch.admin.bag.covidcertificate.service.NotificationService;
+import ch.admin.bag.covidcertificate.web.security.AuthorizationInterceptor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flextrade.jfixture.JFixture;
 import org.hamcrest.Matchers;
@@ -47,11 +48,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("Tests for NotificationsController")
 class NotificationsControllerTest {
     @MockBean
+    private AuthorizationInterceptor authorizationInterceptor;
+    @MockBean
     private NotificationService notificationService;
     @MockBean
     private OAuth2SecuredWebConfiguration.OAuth2SecuredWebMvcConfiguration oAuth2SecuredWebMvcConfiguration;
-    @MockBean
-    private SecurityHelper securityHelper;
     @Autowired
     private MockMvc mockMvc;
 
@@ -62,7 +63,7 @@ class NotificationsControllerTest {
 
     @BeforeEach
     void beforeEach() {
-        when(securityHelper.authorizeUser(any())).thenReturn(true);
+        when(authorizationInterceptor.preHandle(any(), any(), any())).thenReturn(true);
         this.validNotificationDto = new NotificationDto(
                 MessageType.INFO,
                 new MessageDto("de", "fr", "it", "en"),
@@ -74,23 +75,6 @@ class NotificationsControllerTest {
     @Nested
     @DisplayName("Tests for get")
     class GetAllNotificationsTest {
-        @Test
-        @DisplayName("When called, it should authorize the user")
-        void GetTest1() throws Exception {
-            // given
-            List<NotificationDto> notifications = Collections.emptyList();
-            when(notificationService.readNotifications()).thenReturn(notifications);
-
-            // when
-            mockMvc.perform(get(URL)
-                    .accept(MediaType.ALL_VALUE)
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .header("Authorization", fixture.create(String.class)));
-
-            // then
-            verify(securityHelper).authorizeUser(any());
-        }
-
         @Test
         @DisplayName("Given no notifications are present, when called, it should return 204 No Content")
         void GetTest2() throws Exception {
@@ -152,24 +136,6 @@ class NotificationsControllerTest {
         @BeforeEach
         void beforeEach() {
             lenient().doNothing().when(notificationService).writeNotifications(any());
-        }
-
-        @Test
-        @DisplayName("When called, it should authorize the user")
-        void PostTest1() throws Exception {
-            // given
-            var notifications = List.of(validNotificationDto);
-            var notificationsStr = mapper.writeValueAsString(notifications);
-
-            // when
-            mockMvc.perform(post(URL)
-                    .accept(MediaType.ALL_VALUE)
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .header("Authorization", fixture.create(String.class))
-                    .content(notificationsStr));
-
-            // then
-            verify(securityHelper).authorizeUser(any());
         }
 
         @Test
@@ -241,23 +207,6 @@ class NotificationsControllerTest {
         @BeforeEach
         void beforeEach() {
             lenient().doNothing().when(notificationService).removeNotifications();
-        }
-
-        @Test
-        @DisplayName("When called, it should authorize the user")
-        void DeleteTest1() throws Exception {
-            // given
-            var notifications = List.of(validNotificationDto);
-            var notificationsStr = mapper.writeValueAsString(notifications);
-
-            // when
-            mockMvc.perform(delete(URL)
-                    .accept(MediaType.ALL_VALUE)
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .header("Authorization", fixture.create(String.class)));
-
-            // then
-            verify(securityHelper).authorizeUser(any());
         }
 
         @Test

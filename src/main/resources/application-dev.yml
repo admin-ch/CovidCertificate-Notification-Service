@@ -13,3 +13,6 @@ cc-notification-service:
       password: ${vcap.services.cc_prometheus.credentials.password}
 
   allowed-origin: "https://www.covidcertificate-d.admin.ch"
+
+cc-management-service:
+  uri: "https://cc-management-service.dev.app.cfap02.atlantica.admin.ch/"

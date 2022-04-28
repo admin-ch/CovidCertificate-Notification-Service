@@ -15,10 +15,10 @@ public class AuthorizationInterceptorConfig implements WebMvcConfigurer {
         registry.addInterceptor(interceptor)
                 .excludePathPatterns(
                         "/error",
-                        "/actuator/.*",
+                        "/actuator/**",
                         "/swagger-ui.html",
-                        "/swagger-ui/.*",
-                        "/v3/api-docs/.*",
+                        "/swagger-ui/**",
+                        "/v3/api-docs/**",
                         "/api/v1/ping"
                 );
     }

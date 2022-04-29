@@ -1,5 +1,7 @@
 package ch.admin.bag.covidcertificate.service.config;
 
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.reactive.function.client.ClientRequest;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
@@ -7,6 +9,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import static org.springframework.security.oauth2.client.web.reactive.function.client.ServerOAuth2AuthorizedClientExchangeFilterFunction.clientRegistrationId;
 
+@Slf4j
 public class DefaultJeapOAuth2WebclientBuilderFactory implements JeapOAuth2WebclientBuilderFactory {
 
     private final WebClient.Builder webClientBuilder;
@@ -22,7 +25,14 @@ public class DefaultJeapOAuth2WebclientBuilderFactory implements JeapOAuth2Webcl
     @Override
     public WebClient.Builder createForClientId(String clientId) {
         assertOAuth2ClientConfigured();
-        return webClientBuilder.clone().
+        return webClientBuilder.clone()
+
+                .filter((request, next) -> {
+                    log.info("HEADERS for url {}: {}", request.url(), StringUtils.join(request.headers()));
+                    return next.exchange(request);
+                })
+                        .
+
                 // Make the client id for the OAauth2 exchange filter function known
                         filter((request, next) -> next.exchange(ClientRequest.from(request).attributes(clientRegistrationId(clientId)).build())).
                 // Enable OAuth2 bearer token population on exchanges

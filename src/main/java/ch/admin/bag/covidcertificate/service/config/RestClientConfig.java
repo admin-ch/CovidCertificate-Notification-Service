@@ -3,7 +3,6 @@ package ch.admin.bag.covidcertificate.service.config;
 import io.netty.channel.ChannelOption;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,10 +38,6 @@ public class RestClientConfig {
         return jeapOAuth2WebclientBuilderFactory
                 .createForClientId(applicationName)
                 .clientConnector(connector)
-                .filter((request, next) -> {
-                    log.info("HEADERS: " + StringUtils.join(request.headers()));
-                    return next.exchange(request);
-                })
                 .build();
     }
 }

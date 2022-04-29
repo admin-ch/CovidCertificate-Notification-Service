@@ -60,7 +60,7 @@ public class AuthorizationClient {
     @Scheduled(cron = "${cc-management-service.authorization.data-sync.cron}")
     @CacheEvict(value = {SERVICE_DEFINITION_CACHE_NAME}, allEntries = true)
     public void resetCaches() {
-        log.info("Reset cachess.");
+        log.info("Reset caches.");
     }
 
     private <T> Optional<T> fetch(String uri, Class<T> classType) {

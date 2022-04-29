@@ -26,17 +26,14 @@ public class DefaultJeapOAuth2WebclientBuilderFactory implements JeapOAuth2Webcl
     public WebClient.Builder createForClientId(String clientId) {
         assertOAuth2ClientConfigured();
         return webClientBuilder.clone()
-
+                // Make the client id for the OAauth2 exchange filter function known
+                .filter((request, next) -> next.exchange(ClientRequest.from(request).attributes(clientRegistrationId(clientId)).build()))
+                // Enable OAuth2 bearer token population on exchanges
+                .filter(oauth2ClientExchangeFilterFunction)
                 .filter((request, next) -> {
                     log.info("HEADERS for url {}: {}", request.url(), StringUtils.join(request.headers()));
                     return next.exchange(request);
-                })
-                        .
-
-                // Make the client id for the OAauth2 exchange filter function known
-                        filter((request, next) -> next.exchange(ClientRequest.from(request).attributes(clientRegistrationId(clientId)).build())).
-                // Enable OAuth2 bearer token population on exchanges
-                        filter(oauth2ClientExchangeFilterFunction);
+                });
     }
 
     @Override

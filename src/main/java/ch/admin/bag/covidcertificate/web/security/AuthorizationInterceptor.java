@@ -34,39 +34,47 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         String uri = request.getRequestURI();
         String httpMethod = request.getMethod();
+        log.info("Call of preHandle with URI: {}", uri);
 
-        JeapAuthenticationToken authentication = ((JeapAuthenticationToken) SecurityContextHolder
-                .getContext()
-                .getAuthentication());
-        Set<String> rawRoles = authentication.getUserRoles();
-        boolean isHinUser = rawRoles.contains("bag-cc-hin-epr") || rawRoles.contains("bag-cc-hin");
-        boolean isHinCodeOrPersonal = rawRoles.contains("bag-cc-hincode") || rawRoles.contains("bag-cc-personal");
-        if (isHinUser && !isHinCodeOrPersonal) {
-            log.warn("HIN-User not allowed to use the application...");
-            log.warn("userroles: {}", rawRoles);
-            throw new AuthorizationException(Constants.ACCESS_DENIED_FOR_HIN_WITH_CH_LOGIN);
-        }
+        try {
+            JeapAuthenticationToken authentication = ((JeapAuthenticationToken) SecurityContextHolder
+                    .getContext()
+                    .getAuthentication());
+            Set<String> rawRoles = authentication.getUserRoles();
+            boolean isHinUser = rawRoles.contains("bag-cc-hin-epr") || rawRoles.contains("bag-cc-hin");
+            boolean isHinCodeOrPersonal = rawRoles.contains("bag-cc-hincode") || rawRoles.contains("bag-cc-personal");
+            if (isHinUser && !isHinCodeOrPersonal) {
+                log.warn("HIN-User not allowed to use the application...");
+                log.warn("userroles: {}", rawRoles);
+                throw new AuthorizationException(Constants.ACCESS_DENIED_FOR_HIN_WITH_CH_LOGIN);
+            }
 
-        Set<String> roles = mapRawRoles(rawRoles);
-        ServiceDataDto.Function function = authClient.requestServiceDefinition()
-                .stream()
-                .map(ServiceDataDto::getFunctions)
-                .map(Map::values)
-                .flatMap(Collection::stream)
-                .filter(f -> StringUtils.hasText(f.getUri()))
-                .filter(f -> f.matchesUri(uri))
-                .filter(f -> f.matchesHttpMethod(httpMethod))
-                .filter(f -> f.isBetween(LocalDateTime.now()))
-                .findAny()
-                .orElseThrow(() -> new AuthorizationException(Constants.NO_FUNCTION_CONFIGURED, uri));
+            Set<String> roles = mapRawRoles(rawRoles);
+            ServiceDataDto.Function function = authClient.requestServiceDefinition()
+                    .stream()
+                    .map(ServiceDataDto::getFunctions)
+                    .map(Map::values)
+                    .flatMap(Collection::stream)
+                    .filter(f -> StringUtils.hasText(f.getUri()))
+                    .filter(f -> f.matchesUri(uri))
+                    .filter(f -> f.matchesHttpMethod(httpMethod))
+                    .filter(f -> f.isBetween(LocalDateTime.now()))
+                    .findAny()
+                    .orElseThrow(() -> new AuthorizationException(Constants.NO_FUNCTION_CONFIGURED, uri));
 
-        log.info("Verify function authorization: {}, {}, {}",
-                kv("clientId", authentication.getClientId()),
-                kv("roles", roles),
-                kv("function", function.getIdentifier()));
+            log.info("Verify function authorization: {}, {}, {}",
+                    kv("clientId", authentication.getClientId()),
+                    kv("roles", roles),
+                    kv("function", function.getIdentifier()));
 
-        boolean isGranted = isGranted(roles, function);
-        if (!isGranted) {
+            boolean isGranted = isGranted(roles, function);
+            if (!isGranted) {
+                throw new AuthorizationException(Constants.FORBIDDEN, uri);
+            }
+
+
+        } catch (ClassCastException e) {
+            log.error(e.getMessage());
             throw new AuthorizationException(Constants.FORBIDDEN, uri);
         }
 

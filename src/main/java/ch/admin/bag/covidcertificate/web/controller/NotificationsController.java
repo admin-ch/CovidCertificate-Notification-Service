@@ -47,6 +47,5 @@ public class NotificationsController {
         log.info("Call of deleting notifications.");
         notificationService.removeNotifications();
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-
     }
 }

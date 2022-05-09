@@ -25,9 +25,6 @@ jeap:
 cc-notification-service:
   allowed-origin: "*"
 
-CF_INSTANCE_INDEX: 0
-
-
 cc-management-service:
   uri: http://localhost:8120/
   authorization:

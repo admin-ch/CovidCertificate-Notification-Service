@@ -34,7 +34,7 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         String uri = request.getRequestURI();
         String httpMethod = request.getMethod();
-        log.info("Call of preHandle with URI: {}", uri);
+        log.info("Call of preHandle with URI: {} and Method: {}", uri, httpMethod);
 
         try {
             JeapAuthenticationToken authentication = ((JeapAuthenticationToken) SecurityContextHolder
@@ -62,14 +62,18 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
                     .findAny()
                     .orElseThrow(() -> new AuthorizationException(Constants.NO_FUNCTION_CONFIGURED, uri));
 
-            log.info("Verify function authorization: {}, {}, {}",
-                    kv("clientId", authentication.getClientId()),
-                    kv("roles", roles),
-                    kv("function", function.getIdentifier()));
-
             boolean isGranted = isGranted(roles, function);
             if (!isGranted) {
+                log.info("Function authorization not granted: {}, {}, {}",
+                         kv("clientId", authentication.getClientId()),
+                         kv("roles", roles),
+                         kv("function", function.getIdentifier()));
                 throw new AuthorizationException(Constants.FORBIDDEN, uri);
+            } else {
+                log.info("Function authorization granted: {}, {}, {}",
+                         kv("clientId", authentication.getClientId()),
+                         kv("roles", roles),
+                         kv("function", function.getIdentifier()));
             }
 
 

@@ -11,7 +11,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -29,7 +28,6 @@ public class NotificationService {
 
     private final ObjectMapper mapper;
 
-    @Cacheable(NOTIFICATIONS_CACHE_NAME)
     public List<NotificationDto> readNotifications() {
         log.info("Read all notifications");
         mapper.configure(DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY, true);
@@ -38,6 +36,7 @@ public class NotificationService {
         if (notification.isEmpty()) {
             return Collections.emptyList();
         }
+        log.info("Read notifications are: " + notification.get().getContent());
 
         try {
             NotificationDto[] notifications = mapper.readValue(notification.get().getContent(), NotificationDto[].class);

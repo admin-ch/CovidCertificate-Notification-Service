@@ -23,5 +23,8 @@ jeap:
 cc-notification-service:
   allowed-origin: "https://www.covidcertificate-d.admin.ch"
 
+  truststore:
+    password: ${vcap.services.cc_trust_store.credentials.password}
+
 cc-management-service:
   uri: "https://cc-management-service.dev.app.cfap02.atlantica.admin.ch/"

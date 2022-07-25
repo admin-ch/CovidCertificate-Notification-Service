@@ -26,5 +26,8 @@ cc-notification-service:
 
   allowed-origin: "https://www.covidcertificate.admin.ch"
 
+  truststore:
+    password: ${vcap.services.cc_trust_store.credentials.password}
+
 cc-management-service:
   uri: "https://cc-management-service.app.cfap02.atlantica.admin.ch/"

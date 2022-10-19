@@ -1,15 +1,14 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="CCNotificationServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
-    <module name="CovidCertificate-Notification-Service"/>
+    <option name="ACTIVE_PROFILES" value="local" />
+    <module name="cc-notification-service" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="ch.admin.bag.covidcertificate.NotificationServiceApplication" />
     <extension name="coverage">
       <pattern>
         <option name="PATTERN" value="ch.admin.bag.covidcertificate.*" />
         <option name="ENABLED" value="true" />
       </pattern>
     </extension>
-    <option name="SPRING_BOOT_MAIN_CLASS" value="ch.admin.bag.covidcertificate.NotificationServiceApplication" />
-    <option name="ACTIVE_PROFILES" value="local" />
-    <option name="ALTERNATIVE_JRE_PATH" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

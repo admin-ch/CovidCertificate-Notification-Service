@@ -1,21 +1,17 @@
 package ch.admin.bag.covidcertificate.service;
 
-import ch.admin.bag.covidcertificate.api.exception.NotificationException;
-import ch.admin.bag.covidcertificate.api.request.MessageDto;
-import ch.admin.bag.covidcertificate.api.request.MessageType;
-import ch.admin.bag.covidcertificate.api.request.NotificationDto;
+import ch.admin.bag.covidcertificate.api.mapper.NotificationMapper;
+import ch.admin.bag.covidcertificate.api.request.EditNotificationDto;
+import ch.admin.bag.covidcertificate.api.request.NotificationContentDto;
+import ch.admin.bag.covidcertificate.api.request.NotificationType;
 import ch.admin.bag.covidcertificate.domain.Notification;
 import ch.admin.bag.covidcertificate.domain.NotificationRepository;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
-import org.mockito.Answers;
-import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -25,16 +21,14 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
-import static ch.admin.bag.covidcertificate.api.Constants.NOTIFICATION_ALREADY_EXISTING_ERROR;
-import static ch.admin.bag.covidcertificate.api.Constants.NOTIFICATION_MAPPING_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -50,36 +44,44 @@ class NotificationServiceTest {
     @Mock
     private NotificationRepository notificationRepository;
 
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private ObjectMapper mapper;
+    @Mock
+    private NotificationMapper notificationMapper;
 
     private Notification notification;
-    private NotificationDto notificationDto;
+    private EditNotificationDto notificationDto;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-    private final String notificationJsonStr = "[\n" +
-            "    {\n" +
-            "        \"type\": \"INFO\",\n" +
-            "        \"message\": {\n" +
+    private final String notificationContentJsonStr = "{\n" +
             "            \"de\": \"de\",\n" +
             "            \"fr\": \"fr\",\n" +
             "            \"it\": \"it\",\n" +
             "            \"en\": \"en\"\n" +
-            "        },\n" +
-            "        \"start\": \"2022-03-09 11:30\",\n" +
-            "        \"end\": \"2022-03-09 11:31\"\n" +
-            "    }\n" +
-            "]";
+            "        }";
 
     @BeforeEach
     void beforeEach() {
-        notification = new Notification(notificationJsonStr);
-        notificationDto = new NotificationDto(MessageType.INFO, new MessageDto("de", "fr", "it", "en"), LocalDateTime.parse("2022-03-09 11:30", formatter), LocalDateTime.parse("2022-03-09 11:31", formatter));
+        notification = Notification.builder()
+                .id(UUID.randomUUID())
+                .type(NotificationType.INFO)
+                .content(notificationContentJsonStr)
+                .startTime(LocalDateTime.parse("2022-03-09 11:30", formatter))
+                .endTime(LocalDateTime.parse("2022-03-09 11:31", formatter))
+                .isClosable(true)
+                .build();
+
+        notificationDto = EditNotificationDto.builder()
+                .id(UUID.randomUUID())
+                .type(NotificationType.INFO)
+                .content(new NotificationContentDto("de", "fr", "it", "en"))
+                .isClosable(true)
+                .startTime(LocalDateTime.parse("2022-03-09 11:30", formatter))
+                .endTime(LocalDateTime.parse("2022-03-09 11:31", formatter))
+                .build();
     }
 
     @Nested
     @DisplayName("Tests for readNotification")
-    public class ReadNotificationsTest {
+    class ReadNotificationsTest {
 
         @BeforeEach
         void beforeEach() {
@@ -97,94 +99,54 @@ class NotificationServiceTest {
             var notifications = notificationService.readNotifications();
 
             // then
-            assertEquals(notifications, Collections.emptyList());
+            assertEquals(Collections.emptyList(), notifications);
         }
 
         @Test
         @DisplayName("Given notifications are present, when called, it should return the list of NotificationDto")
-        void readNotificationTest2() throws JsonProcessingException {
+        void readNotificationTest2() {
+
             // given
-            when(mapper.readValue(anyString(), ArgumentMatchers.<Class<NotificationDto[]>>any())).thenReturn(new NotificationDto[]{notificationDto});
+            when(notificationMapper.fromEntity(anyList())).thenReturn(List.of(notificationDto));
 
             // when
             var notifications = notificationService.readNotifications();
 
             // then
-            assertThat(notifications.get(0)).usingRecursiveComparison().isEqualTo(notificationDto);
-        }
-
-        @Test
-        @DisplayName("Given JSON mapping fails, when called, it should throw NotificationException")
-        void readNotificationTest3() throws JsonProcessingException {
-            // given
-            when(mapper.readValue(anyString(), ArgumentMatchers.<Class<Notification[]>>any())).thenThrow(JsonProcessingException.class);
-
-            // when then
-            var e = assertThrows(NotificationException.class, notificationService::readNotifications);
-            assertEquals(e.getError(), NOTIFICATION_MAPPING_ERROR);
+            assertThat(notifications).usingRecursiveComparison().isEqualTo(List.of(notificationDto));
         }
     }
 
     @Nested
     @DisplayName("Tests for writeNotification")
-    public class WriteNotificationsTest {
-
-        @BeforeEach
-        void beforeEach() {
-            when(notificationRepository.count()).thenReturn(0L);
-        }
+    class WriteNotificationsTest {
 
         @Test
-        @DisplayName("Given notifications are present, when called, it should throw NotificationException")
+        @DisplayName("When called, it should save notifications")
         void writeNotificationTest1() {
-            // given
-            when(notificationRepository.count()).thenReturn(1L);
-
-            // when then
-            var e = assertThrows(NotificationException.class, () -> notificationService.writeNotifications(List.of(notificationDto)));
-            assertEquals(e.getError(), NOTIFICATION_ALREADY_EXISTING_ERROR);
-        }
-
-        @Test
-        @DisplayName("Given no notifications are present, when called, it should save the notifications")
-        void writeNotificationTest2() throws JsonProcessingException {
-            // given
-            when(mapper.writer().writeValueAsString(any())).thenReturn(notificationJsonStr);
-
             // when
-            notificationService.writeNotifications(List.of(notificationDto));
+            notificationService.editNotification(notificationDto);
 
             // then
-            verify(notificationRepository).save(argThat(argument -> argument.getContent().equals(notificationJsonStr)));
-        }
-
-        @Test
-        @DisplayName("Given JSON mapping fails, when called, it should throw NotificationException")
-        void writeNotificationTest3() throws JsonProcessingException {
-            // given
-            when(mapper.writer().writeValueAsString(any())).thenThrow(JsonProcessingException.class);
-
-            // when then
-            var e = assertThrows(NotificationException.class, () -> notificationService.writeNotifications(List.of(notificationDto)));
-            assertEquals(e.getError(), NOTIFICATION_MAPPING_ERROR);
+            verify(notificationRepository, times(1)).save(any());
         }
     }
 
     @Nested
     @DisplayName("Tests for removeNotification")
-    public class RemoveNotificationsTest {
+    class RemoveNotificationsTest {
 
         @Test
         @DisplayName("When called, it should delete the notification")
         void removeNotificationTest1() {
             // given
-            doNothing().when(notificationRepository).deleteAll();
+            doNothing().when(notificationRepository).delete(any());
 
             // when
-            notificationService.removeNotifications();
+            notificationService.removeNotifications(UUID.randomUUID().toString());
 
             // then
-            verify(notificationRepository).deleteAll();
+            verify(notificationRepository, times(1)).delete(any());
         }
     }
 }

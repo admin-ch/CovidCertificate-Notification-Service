@@ -1,21 +1,19 @@
 package ch.admin.bag.covidcertificate.service;
 
-import ch.admin.bag.covidcertificate.api.Constants;
-import ch.admin.bag.covidcertificate.api.exception.NotificationException;
-import ch.admin.bag.covidcertificate.api.request.NotificationDto;
+import ch.admin.bag.covidcertificate.api.mapper.NotificationMapper;
+import ch.admin.bag.covidcertificate.api.request.CreateNotificationDto;
+import ch.admin.bag.covidcertificate.api.request.EditNotificationDto;
 import ch.admin.bag.covidcertificate.domain.Notification;
 import ch.admin.bag.covidcertificate.domain.NotificationRepository;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -25,48 +23,36 @@ public class NotificationService {
     private static final String NOTIFICATIONS_CACHE_NAME = "notifications";
 
     private final NotificationRepository notificationRepository;
+    private final NotificationMapper notificationMapper;
 
-    private final ObjectMapper mapper;
-
-    public List<NotificationDto> readNotifications() {
+    @Cacheable(NOTIFICATIONS_CACHE_NAME)
+    public List<EditNotificationDto> readNotifications() {
         log.info("Read all notifications");
-        mapper.configure(DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY, true);
 
-        var notification = this.notificationRepository.findAll().stream().findFirst();
-        if (notification.isEmpty()) {
+        var notifications = this.notificationRepository.findAll();
+        if (notifications.isEmpty()) {
             return Collections.emptyList();
         }
-        log.info("Read notifications are: " + notification.get().getContent());
+        log.info(notifications.size() + " notifications present");
 
-        try {
-            NotificationDto[] notifications = mapper.readValue(notification.get().getContent(), NotificationDto[].class);
-            return Arrays.asList(notifications);
-        } catch (JsonProcessingException e) {
-            log.error(e.getMessage());
-            throw new NotificationException(Constants.NOTIFICATION_MAPPING_ERROR);
-        }
+        return notificationMapper.fromEntity(notifications);
     }
 
     @CacheEvict(value = NOTIFICATIONS_CACHE_NAME, allEntries = true)
-    public void writeNotifications(List<NotificationDto> notifications) {
-        log.info("Write notifications");
-
-        if (this.notificationRepository.count() > 0) {
-            throw new NotificationException(Constants.NOTIFICATION_ALREADY_EXISTING_ERROR);
-        }
-
-        try {
-            String notificationsJson = mapper.writer().writeValueAsString(notifications);
-            this.notificationRepository.save(new Notification(notificationsJson));
-        } catch (JsonProcessingException e) {
-            log.error(e.getMessage());
-            throw new NotificationException(Constants.NOTIFICATION_MAPPING_ERROR);
-        }
+    public void createNotification(CreateNotificationDto notification) {
+        log.info("Create notification");
+        this.notificationRepository.save(notificationMapper.fromDto(notification));
     }
 
     @CacheEvict(value = NOTIFICATIONS_CACHE_NAME, allEntries = true)
-    public void removeNotifications() {
-        log.info("Remove notifications");
-        this.notificationRepository.deleteAll();
+    public void editNotification(EditNotificationDto notification) {
+        log.info("Write notification");
+        this.notificationRepository.save(notificationMapper.fromDto(notification));
+    }
+
+    @CacheEvict(value = NOTIFICATIONS_CACHE_NAME, allEntries = true)
+    public void removeNotifications(String id) {
+        log.info("Remove notification with id: " + id);
+        this.notificationRepository.delete(Notification.builder().id(UUID.fromString(id)).build());
     }
 }

@@ -1,6 +1,7 @@
 package ch.admin.bag.covidcertificate.web.controller;
 
-import ch.admin.bag.covidcertificate.api.request.NotificationDto;
+import ch.admin.bag.covidcertificate.api.request.CreateNotificationDto;
+import ch.admin.bag.covidcertificate.api.request.EditNotificationDto;
 import ch.admin.bag.covidcertificate.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,13 +10,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
 @RestController
@@ -28,24 +30,30 @@ public class NotificationsController {
     private final NotificationService notificationService;
 
     @GetMapping("")
-    public ResponseEntity<List<NotificationDto>> getAllNotifications() {
+    public ResponseEntity<List<EditNotificationDto>> getAllNotifications() {
         log.info("Call to get all notifications.");
         var notifications = notificationService.readNotifications();
-        var responseStatus = notifications.isEmpty() ? HttpStatus.NO_CONTENT : HttpStatus.OK;
-        return new ResponseEntity<>(notifications, responseStatus);
+        return new ResponseEntity<>(notifications, HttpStatus.OK);
     }
 
     @PostMapping("")
-    public ResponseEntity<Void> writeNotifications(@RequestBody @NotEmpty List<@Valid NotificationDto> notifications) {
-        log.info("Call of write notifications.");
-        notificationService.writeNotifications(notifications);
+    public ResponseEntity<Void> createNotifications(@RequestBody @Valid CreateNotificationDto notification) {
+        log.info("Call of create notification.");
+        notificationService.createNotification(notification);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @DeleteMapping("")
-    public ResponseEntity<Void> removeNotifications() {
+    @PutMapping("")
+    public ResponseEntity<Void> editNotifications(@RequestBody @Valid EditNotificationDto notification) {
+        log.info("Call of edit notification.");
+        notificationService.editNotification(notification);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> removeNotifications(@PathVariable String id) {
         log.info("Call of deleting notifications.");
-        notificationService.removeNotifications();
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        notificationService.removeNotifications(id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

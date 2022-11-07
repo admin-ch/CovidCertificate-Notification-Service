@@ -10,12 +10,12 @@
     </parent>
     <groupId>ch.admin.bag.covidcertificate</groupId>
     <artifactId>cc-notification-service</artifactId>
-    <version>4.7.1</version>
+    <version>4.8.1</version>
     <name>cc-notification-service</name>
     <description>Service for generating Covid Certificates</description>
 
     <properties>
-        <java.version>17</java.version>
+        <java.version>11</java.version>
 
         <cc-backend-logging.version>1.0.4</cc-backend-logging.version>
         <commons-collections.version>3.2.2</commons-collections.version>

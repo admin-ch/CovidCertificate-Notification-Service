@@ -1,9 +1,10 @@
 package ch.admin.bag.covidcertificate.web.controller;
 
 import ch.admin.bag.covidcertificate.api.Constants;
-import ch.admin.bag.covidcertificate.api.request.MessageDto;
-import ch.admin.bag.covidcertificate.api.request.MessageType;
-import ch.admin.bag.covidcertificate.api.request.NotificationDto;
+import ch.admin.bag.covidcertificate.api.request.CreateNotificationDto;
+import ch.admin.bag.covidcertificate.api.request.EditNotificationDto;
+import ch.admin.bag.covidcertificate.api.request.NotificationContentDto;
+import ch.admin.bag.covidcertificate.api.request.NotificationType;
 import ch.admin.bag.covidcertificate.config.security.OAuth2SecuredWebConfiguration;
 import ch.admin.bag.covidcertificate.service.NotificationService;
 import ch.admin.bag.covidcertificate.web.security.AuthorizationInterceptor;
@@ -27,9 +28,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
@@ -38,6 +41,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -59,17 +63,25 @@ class NotificationsControllerTest {
     private static final String URL = "/api/v1/notifications";
     private static final JFixture fixture = new JFixture();
     private final ObjectMapper mapper = new ObjectMapper();
-    private NotificationDto validNotificationDto;
+    private EditNotificationDto validEditNotificationDto;
+    private CreateNotificationDto validCreateNotificationDto;
 
     @BeforeEach
     void beforeEach() {
         when(authorizationInterceptor.preHandle(any(), any(), any())).thenReturn(true);
-        this.validNotificationDto = new NotificationDto(
-                MessageType.INFO,
-                new MessageDto("de", "fr", "it", "en"),
-                LocalDateTime.now().minusHours(1),
-                LocalDateTime.now().plusHours(1)
-        );
+        this.validEditNotificationDto = EditNotificationDto.builder()
+                .id(UUID.randomUUID())
+                .type(NotificationType.INFO)
+                .content(new NotificationContentDto("de", "fr", "it", "en"))
+                .isClosable(true)
+                .startTime(LocalDateTime.now().minusHours(1))
+                .endTime(LocalDateTime.now().plusHours(1)).build();
+        this.validCreateNotificationDto = CreateNotificationDto.builder()
+                .type(NotificationType.INFO)
+                .content(new NotificationContentDto("de", "fr", "it", "en"))
+                .isClosable(true)
+                .startTime(LocalDateTime.now().minusHours(1))
+                .endTime(LocalDateTime.now().plusHours(1)).build();
     }
 
     @Nested
@@ -79,7 +91,7 @@ class NotificationsControllerTest {
         @DisplayName("Given no notifications are present, when called, it should return 204 No Content")
         void GetTest2() throws Exception {
             // given
-            List<NotificationDto> notifications = Collections.emptyList();
+            List<EditNotificationDto> notifications = Collections.emptyList();
 
             // when
             when(notificationService.readNotifications()).thenReturn(notifications);
@@ -89,7 +101,7 @@ class NotificationsControllerTest {
                             .accept(MediaType.ALL_VALUE)
                             .contentType(MediaType.APPLICATION_JSON_VALUE)
                             .header("Authorization", fixture.create(String.class)))
-                    .andExpect(status().isNoContent());
+                    .andExpect(status().isOk());
 
         }
 
@@ -97,7 +109,7 @@ class NotificationsControllerTest {
         @DisplayName("Given notifications are present, when called, it should return 200 OK")
         void GetTest3() throws Exception {
             // given
-            var notifications = List.of(new NotificationDto());
+            var notifications = List.of(new EditNotificationDto());
 
             // when
             when(notificationService.readNotifications()).thenReturn(notifications);
@@ -115,7 +127,7 @@ class NotificationsControllerTest {
         @DisplayName("Given notifications are present, when called, it should return the notifications")
         void GetTest4() throws Exception {
             // given
-            var notifications = List.of(new NotificationDto());
+            var notifications = List.of(new EditNotificationDto());
 
             // when
             when(notificationService.readNotifications()).thenReturn(notifications);
@@ -131,19 +143,18 @@ class NotificationsControllerTest {
 
     @Nested
     @DisplayName("Tests for post")
-    class WriteNotificationsTest {
+    class CreateNotificationsTest {
 
         @BeforeEach
         void beforeEach() {
-            lenient().doNothing().when(notificationService).writeNotifications(any());
+            lenient().doNothing().when(notificationService).createNotification(any());
         }
 
         @Test
         @DisplayName("Given notifications are valid, when called, it should return status 201 Created")
         void PostTest2() throws Exception {
             // given
-            var notifications = List.of(validNotificationDto);
-            var notificationsStr = mapper.writeValueAsString(notifications);
+            var notificationsStr = mapper.writeValueAsString(validCreateNotificationDto);
 
             // when then
             mockMvc.perform(post(URL)
@@ -153,21 +164,21 @@ class NotificationsControllerTest {
                             .content(notificationsStr))
                     .andExpect(status().isCreated());
 
-            verify(notificationService).writeNotifications(any());
+            verify(notificationService).createNotification(any());
         }
 
         @ParameterizedTest
-        @CsvFileSource(resources = "/csv/notifications_dto.csv", delimiter = 'þ')
-        @DisplayName("Given notifications are invalid, when called, it should return status 400 Bad Request")
-        void PostTest3(String notifications, String expectedErrMsg) throws Exception {
+        @CsvFileSource(resources = "/csv/create_notifications_dto.csv", delimiter = 'þ')
+        @DisplayName("Given notification is invalid, when called, it should return status 400 Bad Request")
+        void PostTest3(String notification, String expectedErrMsg) throws Exception {
             // given
             var request = post(URL)
                     .accept(MediaType.ALL_VALUE)
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                     .header("Authorization", fixture.create(String.class));
 
-            if (Objects.nonNull(notifications)) {
-                request.content(notifications);
+            if (Objects.nonNull(notification)) {
+                request.content(notification);
             }
 
             // when then
@@ -180,9 +191,9 @@ class NotificationsControllerTest {
         @Test
         @DisplayName("Given 'end' is in past, when called, it should return status 400 Bad Request")
         void PostTest4() throws Exception {
-            validNotificationDto.setEnd(LocalDateTime.now().minusHours(1));
-            validNotificationDto.setStart(LocalDateTime.now().minusHours(2));
-            var notificationsStr = mapper.writeValueAsString(List.of(validNotificationDto));
+            validCreateNotificationDto.setEndTime(LocalDateTime.now().minusHours(1));
+            validCreateNotificationDto.setStartTime(LocalDateTime.now().minusHours(2));
+            var notificationsStr = mapper.writeValueAsString(validCreateNotificationDto);
 
             // given
             var request = post(URL)
@@ -201,25 +212,94 @@ class NotificationsControllerTest {
     }
 
     @Nested
+    @DisplayName("Tests for put")
+    class EditNotificationsTest {
+
+        @BeforeEach
+        void beforeEach() {
+            lenient().doNothing().when(notificationService).editNotification(any());
+        }
+
+        @Test
+        @DisplayName("Given notifications are valid, when called, it should return status 201 Created")
+        void PostTest2() throws Exception {
+            // given
+            var notificationsStr = mapper.writeValueAsString(validEditNotificationDto);
+
+            // when then
+            mockMvc.perform(put(URL)
+                            .accept(MediaType.ALL_VALUE)
+                            .contentType(MediaType.APPLICATION_JSON_VALUE)
+                            .header("Authorization", fixture.create(String.class))
+                            .content(notificationsStr))
+                    .andExpect(status().isOk());
+
+            verify(notificationService).editNotification(any());
+        }
+
+        @ParameterizedTest
+        @CsvFileSource(resources = "/csv/edit_notifications_dto.csv", delimiter = 'þ')
+        @DisplayName("Given notification is invalid, when called, it should return status 400 Bad Request")
+        void PostTest3(String notification, String expectedErrMsg) throws Exception {
+            // given
+            var request = put(URL)
+                    .accept(MediaType.ALL_VALUE)
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                    .header("Authorization", fixture.create(String.class));
+
+            if (Objects.nonNull(notification)) {
+                request.content(notification);
+            }
+
+            // when then
+            mockMvc.perform(request)
+                    .andExpect(status().isBadRequest())
+                    .andExpect(content().string(Matchers.containsString(expectedErrMsg)));
+
+        }
+
+        @Test
+        @DisplayName("Given 'end' is in past, when called, it should return status 200 OK")
+        void PostTest4() throws Exception {
+            validEditNotificationDto.setEndTime(LocalDateTime.now(ZoneOffset.UTC).minusHours(1));
+            validEditNotificationDto.setStartTime(LocalDateTime.now(ZoneOffset.UTC).minusHours(2));
+            var notificationsStr = mapper.writeValueAsString(validEditNotificationDto);
+
+            // given
+            var request = put(URL)
+                    .accept(MediaType.ALL_VALUE)
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                    .content(notificationsStr)
+                    .header("Authorization", fixture.create(String.class));
+
+            // when then
+            mockMvc.perform(request)
+                    .andExpect(status().isOk());
+
+        }
+
+    }
+
+    @Nested
     @DisplayName("Tests for delete")
     class RemoveNotificationsTest {
 
         @BeforeEach
         void beforeEach() {
-            lenient().doNothing().when(notificationService).removeNotifications();
+            lenient().doNothing().when(notificationService).removeNotifications(any());
         }
 
         @Test
         @DisplayName("Given notifications are valid, when called, it should return 201 Created")
         void DeleteTest2() throws Exception {
             // when then
-            mockMvc.perform(delete(URL)
+            mockMvc.perform(delete(URL + "/123")
                             .accept(MediaType.ALL_VALUE)
                             .contentType(MediaType.APPLICATION_JSON_VALUE)
                             .header("Authorization", fixture.create(String.class)))
-                    .andExpect(status().isNoContent());
+                    .andExpect(status().isOk());
 
-            verify(notificationService).removeNotifications();
+            verify(notificationService).removeNotifications(any());
         }
     }
 }

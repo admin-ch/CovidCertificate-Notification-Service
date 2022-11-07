@@ -1,8 +1,9 @@
 package ch.admin.bag.covidcertificate.web.controller;
 
-import ch.admin.bag.covidcertificate.api.request.MessageDto;
-import ch.admin.bag.covidcertificate.api.request.MessageType;
+import ch.admin.bag.covidcertificate.api.request.CreateNotificationDto;
+import ch.admin.bag.covidcertificate.api.request.NotificationContentDto;
 import ch.admin.bag.covidcertificate.api.request.NotificationDto;
+import ch.admin.bag.covidcertificate.api.request.NotificationType;
 import ch.admin.bag.covidcertificate.api.security.ServiceDataDto;
 import ch.admin.bag.covidcertificate.config.security.OAuth2SecuredWebConfiguration;
 import ch.admin.bag.covidcertificate.service.NotificationService;
@@ -27,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doNothing;
@@ -42,7 +44,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class NotificationControllerSecurityTest extends AbstractSecurityTest {
     public static final String COVID_APP_MANAGER = "bag-cc-covid_app_manager";
     private static final String URL = "/api/v1/notifications";
-    private final List<NotificationDto> notifications = List.of(new NotificationDto(MessageType.INFO, new MessageDto("de", "fr", "it", "en"), LocalDateTime.now().minusHours(1), LocalDateTime.now().plusHours(1)));
+    private final NotificationDto notification = CreateNotificationDto.builder().type(NotificationType.INFO).content(new NotificationContentDto("de", "fr", "it", "en")).isClosable(true).startTime(LocalDateTime.now().minusHours(1)).endTime(LocalDateTime.now().plusHours(1)).build();
+
+
     @MockBean
     private AuthorizationClient authorizationClient;
     @MockBean
@@ -67,16 +71,19 @@ class NotificationControllerSecurityTest extends AbstractSecurityTest {
 
     @BeforeEach
     void setupMocks() {
-        doNothing().when(notificationService).writeNotifications(any());
+        doNothing().when(notificationService).editNotification(any());
         Map<String, String> roleMap = Map.of(VALID_USER_ROLE, "CERTIFICATE_CREATOR", COVID_APP_MANAGER, "COVID_APP_MANAGER");
         when(authorizationClient.requestRoleMap()).thenReturn(roleMap);
 
         ServiceDataDto.Function getAllNotifications = createFunction("getAllNotifications", roleMap.get(VALID_USER_ROLE), List.of(HttpMethod.GET));
-        ServiceDataDto.Function writeOrDeleteNotifications = createFunction("writeOrDeleteNotifications", roleMap.get(COVID_APP_MANAGER), List.of(HttpMethod.POST, HttpMethod.DELETE));
+        ServiceDataDto.Function writeNotifications = createFunction("writeNotifications", roleMap.get(COVID_APP_MANAGER), List.of(HttpMethod.POST));
+        ServiceDataDto.Function deleteNotifications = createFunction("deleteNotifications", roleMap.get(COVID_APP_MANAGER), List.of(HttpMethod.DELETE));
+        deleteNotifications.setUri("/api/v1/notifications/{notificationId}");
 
         HashMap<String, ServiceDataDto.Function> functions = new HashMap<>();
         functions.put(getAllNotifications.getIdentifier(), getAllNotifications);
-        functions.put(writeOrDeleteNotifications.getIdentifier(), writeOrDeleteNotifications);
+        functions.put(writeNotifications.getIdentifier(), writeNotifications);
+        functions.put(deleteNotifications.getIdentifier(), deleteNotifications);
 
         ServiceDataDto serviceDataDto = new ServiceDataDto();
         serviceDataDto.setFunctions(functions);
@@ -127,7 +134,7 @@ class NotificationControllerSecurityTest extends AbstractSecurityTest {
         @Test
         @DisplayName("Given user authorized, when called, it should return the notifications")
         void readNotificationTest4() throws Exception {
-            performGet(EXPIRED_IN_FUTURE, VALID_USER_ROLE, HttpStatus.NO_CONTENT);
+            performGet(EXPIRED_IN_FUTURE, VALID_USER_ROLE, HttpStatus.OK);
             Mockito.verify(notificationService, times(1)).readNotifications();
         }
 
@@ -155,30 +162,30 @@ class NotificationControllerSecurityTest extends AbstractSecurityTest {
                             .accept(MediaType.ALL_VALUE)
                             .contentType(MediaType.APPLICATION_JSON_VALUE)
                             .header("Authorization", "Bearer")
-                            .content(mapper.writeValueAsString(notifications)))
+                            .content(mapper.writeValueAsString(notification)))
                     .andExpect(status().isForbidden());
-            Mockito.verify(notificationService, times(0)).writeNotifications(any());
+            Mockito.verify(notificationService, times(0)).createNotification(any());
         }
 
         @Test
         @DisplayName("Given user has invalid role, when called, it should return 403 Forbidden")
         void writeNotificationTest2() throws Exception {
             performPost(EXPIRED_IN_FUTURE, INVALID_USER_ROLE, HttpStatus.FORBIDDEN);
-            Mockito.verify(notificationService, times(0)).writeNotifications(any());
+            Mockito.verify(notificationService, times(0)).createNotification(any());
         }
 
         @Test
         @DisplayName("Given auth token is expired, when called, it should return 401 Unauthorized")
         void writeNotificationTest3() throws Exception {
             performPost(EXPIRED_IN_PAST, VALID_USER_ROLE, HttpStatus.UNAUTHORIZED);
-            Mockito.verify(notificationService, times(0)).writeNotifications(any());
+            Mockito.verify(notificationService, times(0)).createNotification(any());
         }
 
         @Test
         @DisplayName("Given user is authorized, when called, it should return 201 Created")
         void writeNotificationTest4() throws Exception {
             performPost(EXPIRED_IN_FUTURE, COVID_APP_MANAGER, HttpStatus.CREATED);
-            Mockito.verify(notificationService, times(1)).writeNotifications(any());
+            Mockito.verify(notificationService, times(1)).createNotification(any());
         }
 
         private void performPost(LocalDateTime tokenExpiration, String userRole, HttpStatus status) throws Exception {
@@ -187,7 +194,17 @@ class NotificationControllerSecurityTest extends AbstractSecurityTest {
                             .accept(MediaType.ALL_VALUE)
                             .contentType(MediaType.APPLICATION_JSON_VALUE)
                             .header("Authorization", "Bearer " + token)
-                            .content(mapper.writeValueAsString(notifications)))
+                            .content(mapper.writeValueAsString(notification)))
+                    .andExpect(getResultMatcher(status));
+        }
+
+        private void performPut(LocalDateTime tokenExpiration, String userRole, HttpStatus status) throws Exception {
+            String token = JwtTestUtil.getJwtTestToken(PRIVATE_KEY, tokenExpiration, userRole);
+            mockMvc.perform(MockMvcRequestBuilders.put(URL)
+                            .accept(MediaType.ALL_VALUE)
+                            .contentType(MediaType.APPLICATION_JSON_VALUE)
+                            .header("Authorization", "Bearer " + token)
+                            .content(mapper.writeValueAsString(notification)))
                     .andExpect(getResultMatcher(status));
         }
 
@@ -204,33 +221,33 @@ class NotificationControllerSecurityTest extends AbstractSecurityTest {
                             .contentType(MediaType.APPLICATION_JSON_VALUE)
                             .header("Authorization", "Bearer"))
                     .andExpect(getResultMatcher(HttpStatus.FORBIDDEN));
-            Mockito.verify(notificationService, times(0)).removeNotifications();
+            Mockito.verify(notificationService, times(0)).removeNotifications(any());
         }
 
         @Test
         @DisplayName("Given user has invalid role, when called, it should return 403 Forbidden")
         void removeNotificationTest2() throws Exception {
             performDelete(EXPIRED_IN_FUTURE, INVALID_USER_ROLE, HttpStatus.FORBIDDEN);
-            Mockito.verify(notificationService, times(0)).removeNotifications();
+            Mockito.verify(notificationService, times(0)).removeNotifications(any());
         }
 
         @Test
         @DisplayName("Given auth token is expired, when called, it should return 401 Unauthorized")
         void removeNotificationTest3() throws Exception {
             performDelete(EXPIRED_IN_PAST, VALID_USER_ROLE, HttpStatus.UNAUTHORIZED);
-            Mockito.verify(notificationService, times(0)).removeNotifications();
+            Mockito.verify(notificationService, times(0)).removeNotifications(any());
         }
 
         @Test
-        @DisplayName("Given user is authorized, when called, it should return 204 No Content")
+        @DisplayName("Given user is authorized, when called, it should return 200 OK")
         void removeNotificationTest4() throws Exception {
-            performDelete(EXPIRED_IN_FUTURE, COVID_APP_MANAGER, HttpStatus.NO_CONTENT);
-            Mockito.verify(notificationService, times(1)).removeNotifications();
+            performDelete(EXPIRED_IN_FUTURE, COVID_APP_MANAGER, HttpStatus.OK);
+            Mockito.verify(notificationService, times(1)).removeNotifications(any());
         }
 
         private void performDelete(LocalDateTime tokenExpiration, String userRole, HttpStatus status) throws Exception {
             String token = JwtTestUtil.getJwtTestToken(PRIVATE_KEY, tokenExpiration, userRole);
-            mockMvc.perform(delete(URL)
+            mockMvc.perform(delete(URL + "/" + UUID.randomUUID())
                             .contentType(MediaType.APPLICATION_JSON_VALUE)
                             .header("Authorization", "Bearer " + token))
                     .andExpect(getResultMatcher(status));

@@ -14,7 +14,7 @@ import static ch.admin.bag.covidcertificate.api.Constants.IT_MUST_NOT_BE_EMPTY;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class MessageDto {
+public class NotificationContentDto {
     @NotBlank(message = DE_MUST_NOT_BE_EMPTY)
     private String de;
     @NotBlank(message = FR_MUST_NOT_BE_EMPTY)

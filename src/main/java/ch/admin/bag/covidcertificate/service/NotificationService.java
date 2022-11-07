@@ -8,6 +8,7 @@ import ch.admin.bag.covidcertificate.domain.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -24,6 +25,7 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final NotificationMapper notificationMapper;
 
+    @Cacheable(NOTIFICATIONS_CACHE_NAME)
     public List<EditNotificationDto> readNotifications() {
         log.info("Read all notifications");
 

@@ -1,0 +1,19 @@
+nullþMalformed Request
+{ "isClosable": true, "content": { "de": "Deutsch", "fr": "Francais", "it": "Italiano", "en": "English" }, "startTime": "2098-03-09T11:30", "endTime": "2098-03-09T11:31"}þType must not be null.
+{ "isClosable": true, "type": "INFO", "startTime": "2098-03-09T11:30", "endTime": "2098-03-09T11:31"}]þContent must not be null.
+{ "isClosable": true, "type": "INFO", "content": { "de": "Deutsch", "fr": "Francais", "it": "Italiano", "en": "English" }, "endTime": "2098-03-09T11:31"}]þStart must not be null.
+{ "isClosable": true, "type": "INFO", "content": { "de": "Deutsch", "fr": "Francais", "it": "Italiano", "en": "English" }, "startTime": "2098-03-09T11:31"}]þEnd must not be null.
+{ "isClosable": true, "type": "INFO", "content": { "fr": "Francais", "it": "Italiano", "en": "English" }, "startTime": "2098-03-09T11:30", "endTime": "2098-03-09T11:31"}þde of content must not be empty.
+{ "isClosable": true, "type": "INFO", "content": { "de": "Deutsch", "it": "Italiano", "en": "English" }, "startTime": "2098-03-09T11:30", "endTime": "2098-03-09T11:31"}þfr of content must not be empty.
+{ "isClosable": true, "type": "INFO", "content": { "de": "Deutsch", "fr": "Francais", "en": "English" }, "startTime": "2098-03-09T11:30", "endTime": "2098-03-09T11:31"}þit of content must not be empty.
+{ "isClosable": true, "type": "INFO", "content": { "de": "Deutsch", "fr": "Francais", "it": "Italiano" }, "startTime": "2098-03-09T11:30", "endTime": "2098-03-09T11:31"}þen of content must not be empty.
+{ "isClosable": true, "type": "INFO", "content": { "de": "", "fr": "Francais", "it": "Italiano", "en": "English" }, "startTime": "2098-03-09T11:30", "endTime": "2098-03-09T11:31"}þde of content must not be empty.
+{ "isClosable": true, "type": "INFO", "content": { "de": "   ", "fr": "Francais", "it": "Italiano", "en": "English" }, "startTime": "2098-03-09T11:30", "endTime": "2098-03-09T11:31"}þde of content must not be empty.
+{ "isClosable": true, "type": "INFO", "content": { "de": "Deutsch", "fr": "", "it": "Italiano", "en": "English" }, "startTime": "2098-03-09T11:30", "endTime": "2098-03-09T11:31"}þfr of content must not be empty.
+{ "isClosable": true, "type": "INFO", "content": { "de": "Deutsch", "fr": "Francais", "it": "", "en": "English" }, "startTime": "2098-03-09T11:30", "endTime": "2098-03-09T11:31"}þit of content must not be empty.
+{ "isClosable": true, "type": "INFO", "content": { "de": "Deutsch", "fr": "Francais", "it": "Italiano", "en": "" }, "startTime": "2098-03-09T11:30", "endTime": "2098-03-09T11:31"}þen of content must not be empty.
+{ "isClosable": true, "type": "INFO", "content": { "de": "Deutsch", "fr": "Francais", "it": "Italiano", "en": "English" }, "startTime": "2098-03-09T11:32", "endTime": "2098-03-09T11:31"}þStart has to be before end.
+{ "isClosable": true, "type": "INFO", "content": { "de": "Deutsch", "fr": "Francais", "it": "Italiano", "en": "English" }, "startTime": "2098-03-09T12:30", "endTime": "2098-03-09T11:31"}þStart has to be before end.
+{ "isClosable": true, "type": "INFO", "content": { "de": "Deutsch", "fr": "Francais", "it": "Italiano", "en": "English" }, "startTime": "2098-03-10T11:30", "endTime": "2098-03-09T11:31"}þStart has to be before end.
+{ "isClosable": true, "type": "INFO", "content": { "de": "Deutsch", "fr": "Francais", "it": "Italiano", "en": "English" }, "startTime": "2098-04-09T11:30", "endTime": "2098-03-09T11:31"}þStart has to be before end.
+{ "isClosable": true, "type": "INFO", "content": { "de": "Deutsch", "fr": "Francais", "it": "Italiano", "en": "English" }, "startTime": "2099-03-09T11:30", "endTime": "2098-03-09T11:31"}þStart has to be before end.

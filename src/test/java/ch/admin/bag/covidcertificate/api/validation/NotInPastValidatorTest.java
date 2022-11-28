@@ -8,6 +8,7 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -24,7 +25,7 @@ class NotInPastValidatorTest {
 
     @Test
     @DisplayName("Given date is 'null', when validated, it should return 'true'")
-    public void validateTest1() {
+    void validateTest1() {
         // given
         LocalDateTime date = null;
 
@@ -37,7 +38,7 @@ class NotInPastValidatorTest {
 
     @Test
     @DisplayName("Given date is barely in the future, when validated, it should return 'true'")
-    public void validateTest2() {
+    void validateTest2() {
         // given
         LocalDateTime date = LocalDateTime.now().plusSeconds(1);
 
@@ -55,21 +56,21 @@ class NotInPastValidatorTest {
         // given
         LocalDateTime currentLocalDate = LocalDateTime.of(2022, 2, 2, 0, 0, 0, 0);
         try (MockedStatic<LocalDateTime> topDateTimeUtilMock = Mockito.mockStatic(LocalDateTime.class)) {
-            topDateTimeUtilMock.when(() -> LocalDateTime.now()).thenReturn(currentLocalDate);
+            topDateTimeUtilMock.when(() -> LocalDateTime.now(ZoneOffset.UTC)).thenReturn(currentLocalDate);
 
             // when
             var result = validator.isValid(currentLocalDate, null);
 
             // then
-            assertFalse(result);
+            assertTrue(result);
         }
     }
 
     @Test
     @DisplayName("Given date is long in the future, when validated, it should return 'true'")
-    public void validateTest4() {
+    void validateTest4() {
         // given
-        LocalDateTime date = LocalDateTime.now().plusYears(1);
+        LocalDateTime date = LocalDateTime.now(ZoneOffset.UTC).plusYears(1);
 
         // when
         var result = validator.isValid(date, null);
@@ -79,10 +80,23 @@ class NotInPastValidatorTest {
     }
 
     @Test
-    @DisplayName("Given date is barely in past, when validated, it should return 'false'")
-    public void validateTest5() {
+    @DisplayName("Given date is barely in past, when validated, it should return 'true'")
+    void validateTest5() {
         // given
-        LocalDateTime date = LocalDateTime.now().minusSeconds(1);
+        LocalDateTime date = LocalDateTime.now(ZoneOffset.UTC).minusSeconds(1);
+
+        // when
+        var result = validator.isValid(date, null);
+
+        // then
+        assertTrue(result);
+    }
+
+    @Test
+    @DisplayName("Given date is more than 15 minutes in past, when validated, it should return 'false'")
+    void validateTest6() {
+        // given
+        LocalDateTime date = LocalDateTime.now(ZoneOffset.UTC).minusMinutes(16);
 
         // when
         var result = validator.isValid(date, null);
@@ -93,9 +107,9 @@ class NotInPastValidatorTest {
 
     @Test
     @DisplayName("Given date is long in past, when validated, it should return 'false'")
-    public void validateTest6() {
+    void validateTest7() {
         // given
-        LocalDateTime date = LocalDateTime.now().minusYears(1);
+        LocalDateTime date = LocalDateTime.now(ZoneOffset.UTC).minusYears(1);
 
         // when
         var result = validator.isValid(date, null);

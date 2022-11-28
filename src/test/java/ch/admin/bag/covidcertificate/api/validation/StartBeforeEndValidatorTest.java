@@ -1,6 +1,6 @@
 package ch.admin.bag.covidcertificate.api.validation;
 
-import ch.admin.bag.covidcertificate.api.request.NotificationDto;
+import ch.admin.bag.covidcertificate.api.request.CreateNotificationDto;
 import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -24,10 +24,10 @@ class StartBeforeEndValidatorTest {
 
     @Test
     @DisplayName("Given 'start' is 'null', when validated, it should return 'true'")
-    public void validateTest1() {
+    void validateTest1() {
         // given
-        var notificationDto = new NotificationDto();
-        notificationDto.setEnd(now);
+        var notificationDto = CreateNotificationDto.builder().build();
+        notificationDto.setEndTime(now);
 
         // when
         var result = validator.isValid(notificationDto, null);
@@ -38,10 +38,10 @@ class StartBeforeEndValidatorTest {
 
     @Test
     @DisplayName("Given 'end' is 'null', when validated, it should return 'true'")
-    public void validateTest2() {
+    void validateTest2() {
         // given
-        var notificationDto = new NotificationDto();
-        notificationDto.setStart(now);
+        var notificationDto = CreateNotificationDto.builder().build();
+        notificationDto.setStartTime(now);
 
         // when
         var result = validator.isValid(notificationDto, null);
@@ -52,9 +52,13 @@ class StartBeforeEndValidatorTest {
 
     @Test
     @DisplayName("Given 'start' is before 'end', when validated, it should return 'true'")
-    public void validateTest3() {
+    void validateTest3() {
         // given
-        var notificationDto = new NotificationDto(null, null, now, now.plusSeconds(1));
+        var notificationDto = CreateNotificationDto.builder()
+                .startTime(now)
+                .endTime(now.plusSeconds(1))
+                .isClosable(true)
+                .build();
 
         // when
         var result = validator.isValid(notificationDto, null);
@@ -64,24 +68,30 @@ class StartBeforeEndValidatorTest {
     }
 
     @Test
-    @DisplayName("Given 'start' is same as 'end', when validated, it should return 'false'")
-    public void validateTest4() {
+    @DisplayName("Given 'start' is same as 'end', when validated, it should return 'true'")
+    void validateTest4() {
         // given
-        var notificationDto = new NotificationDto(null, null, now, now);
-
+        var notificationDto = CreateNotificationDto.builder()
+                .startTime(now)
+                .endTime(now)
+                .isClosable(true)
+                .build();
         // when
         var result = validator.isValid(notificationDto, null);
 
         // then
-        assertFalse(result);
+        assertTrue(result);
     }
 
     @Test
     @DisplayName("Given 'end' is before 'start', when validated, it should return 'false'")
-    public void validateTest5() {
+    void validateTest5() {
         // given
-        var notificationDto = new NotificationDto(null, null, now, now.minusSeconds(1));
-
+        var notificationDto = CreateNotificationDto.builder()
+                .startTime(now)
+                .endTime(now.minusSeconds(1))
+                .isClosable(true)
+                .build();
         // when
         var result = validator.isValid(notificationDto, null);
 

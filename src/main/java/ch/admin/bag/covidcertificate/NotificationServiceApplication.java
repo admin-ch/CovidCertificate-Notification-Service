@@ -39,12 +39,15 @@ public class NotificationServiceApplication {
         if (env.getProperty("server.ssl.key-store") != null) {
             protocol = "https";
         }
-        log.info("\n----------------------------------------------------------\n\t" +
-                        "Yeah!!! {} is running! \n\t" +
-                        "\n" +
-                        "\tSwaggerUI: \t{}://localhost:{}/swagger-ui.html\n\t" +
-                        "Profile(s): \t{}" +
-                        "\n----------------------------------------------------------",
+        final String message = """
+                ----------------------------------------------------------
+                    "Yeah!!! {} is running!
+                    
+                    SwaggerUI:   {}://localhost:{}/swagger-ui.html
+                    "Profile(s): {}
+                ----------------------------------------------------------
+                """;
+        log.info(message,
                 env.getProperty("spring.application.name"),
                 protocol,
                 env.getProperty("server.port"),

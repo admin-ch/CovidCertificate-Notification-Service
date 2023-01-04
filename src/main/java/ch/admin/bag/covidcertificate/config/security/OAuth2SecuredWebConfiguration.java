@@ -29,7 +29,7 @@ import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 import java.time.Duration;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 
 @Configuration
@@ -115,10 +115,9 @@ public class OAuth2SecuredWebConfiguration {
     }
 
     static ContextIssuerJwtValidator createContextIssuerJwtValidator(ResourceServerConfigProperties resourceServerConfigProperties) {
-        Map<JeapAuthenticationContext, String> contextIssuers = new HashMap<>();
+        Map<JeapAuthenticationContext, String> contextIssuers = new EnumMap<>(JeapAuthenticationContext.class);
         final String authorizationServer = resourceServerConfigProperties.getAuthorizationServer().getIssuer();
         contextIssuers.put(JeapAuthenticationContext.USER, authorizationServer);
         return new ContextIssuerJwtValidator(contextIssuers);
     }
-
 }

@@ -98,11 +98,11 @@ spring:
   main:
     banner-mode: off
 
-notification:
+management:
   endpoints:
     web:
       exposure:
-        include: 'info,health,loggers'
+        include: 'info,health,prometheus,loggers'
   endpoint:
     health:
       show-details: always
@@ -113,6 +113,9 @@ cc-notification-service:
   rest:
     connectTimeoutSeconds: 8
     readTimeoutSeconds: 8
+  monitor:
+    prometheus:
+      secure: true
 
 cc-management-service:
   authorization:

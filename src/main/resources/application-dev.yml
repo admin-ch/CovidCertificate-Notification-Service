@@ -21,6 +21,11 @@ jeap:
           issuer: "https://identity-r.bit.admin.ch/realms/BAG-CovidCertificate"
 
 cc-notification-service:
+  monitor:
+    prometheus:
+      user: "prometheus"
+      password: ${vcap.services.cc_prometheus.credentials.password}
+
   allowed-origin: "https://www.covidcertificate-d.admin.ch"
 
   truststore:

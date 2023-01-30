@@ -22,6 +22,10 @@ jeap:
 
 cc-notification-service:
   allowed-origin: "https://www.covidcertificate-a.admin.ch"
+  monitor:
+    prometheus:
+      user: "prometheus"
+      password: ${vcap.services.cc_prometheus.credentials.password}
 
   truststore:
     password: ${vcap.services.cc_trust_store.credentials.password}

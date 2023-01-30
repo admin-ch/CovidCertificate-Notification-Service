@@ -10,7 +10,7 @@
     </parent>
     <groupId>ch.admin.bag.covidcertificate</groupId>
     <artifactId>cc-notification-service</artifactId>
-    <version>4.9.2</version>
+    <version>4.10.2</version>
     <name>cc-notification-service</name>
     <description>Service for generating Covid Certificates</description>
 
@@ -22,10 +22,9 @@
         <com.openhtmltopdf.version>1.0.10</com.openhtmltopdf.version>
         <com.squareup.okhttp3.version>4.10.0</com.squareup.okhttp3.version>
         <commons-collections.version>3.2.2</commons-collections.version>
-        <dgc-java.version>1.0.2</dgc-java.version>
         <google-zxing.version>3.5.1</google-zxing.version>
         <guava.version>31.1-jre</guava.version>
-        <httpclient.version>4.5.13</httpclient.version>
+        <httpclient.version>4.5.14</httpclient.version>
         <jackson-core.version>2.14.1</jackson-core.version>
         <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
         <janino.version>3.1.9</janino.version>
@@ -41,7 +40,7 @@
         <snakeyaml.version>1.32</snakeyaml.version>
         <spring-cloud-starter-sleuth.version>3.1.5</spring-cloud-starter-sleuth.version>
         <spring-cloud.version>2021.0.4</spring-cloud.version>
-        <springdoc.version>1.6.13</springdoc.version>
+        <springdoc.version>1.6.14</springdoc.version>
              
         <maven.javadoc.skip>true</maven.javadoc.skip>
         <log4j2.version>2.19.0</log4j2.version>
@@ -134,17 +133,6 @@
             <groupId>io.pivotal.cfenv</groupId>
             <artifactId>java-cfenv-boot</artifactId>
             <version>${java-cfenv-boot.version}</version>
-            <exclusions>
-                <!-- Avoid versions from java-cfenv-boot / java-cfenv-jdbc leaking into starters -->
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                    <artifactId>jackson-databind</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <!-- monitoring Dependencies -->

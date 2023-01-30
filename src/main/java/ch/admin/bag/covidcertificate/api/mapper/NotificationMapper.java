@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Component
@@ -47,6 +46,6 @@ public class NotificationMapper {
     }
 
     public List<EditNotificationDto> fromEntity(List<Notification> entities) {
-        return entities.stream().map(this::fromEntity).collect(Collectors.toList());
+        return entities.stream().map(this::fromEntity).toList();
     }
 }

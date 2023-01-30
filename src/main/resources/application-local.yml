@@ -23,6 +23,10 @@ jeap:
           jwk-set-uri: "http://localhost:8180/.well-known/jwks.json"
 
 cc-notification-service:
+  monitor:
+    prometheus:
+      user: "prometheus"
+      password: "{noop}secret"
   allowed-origin: "*"
 
 cc-management-service:

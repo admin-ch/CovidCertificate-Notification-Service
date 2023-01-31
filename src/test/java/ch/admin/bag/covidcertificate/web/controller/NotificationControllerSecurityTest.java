@@ -4,11 +4,11 @@ import ch.admin.bag.covidcertificate.api.request.CreateNotificationDto;
 import ch.admin.bag.covidcertificate.api.request.NotificationContentDto;
 import ch.admin.bag.covidcertificate.api.request.NotificationDto;
 import ch.admin.bag.covidcertificate.api.request.NotificationType;
-import ch.admin.bag.covidcertificate.api.security.ServiceDataDto;
+import ch.admin.bag.covidcertificate.authorization.AuthorizationService;
+import ch.admin.bag.covidcertificate.authorization.config.ServiceData;
 import ch.admin.bag.covidcertificate.config.security.OAuth2SecuredWebConfiguration;
 import ch.admin.bag.covidcertificate.service.NotificationService;
 import ch.admin.bag.covidcertificate.testutil.JwtTestUtil;
-import ch.admin.bag.covidcertificate.web.security.AuthorizationClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -24,12 +24,12 @@ import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.startsWith;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
@@ -48,7 +48,7 @@ class NotificationControllerSecurityTest extends AbstractSecurityTest {
 
 
     @MockBean
-    private AuthorizationClient authorizationClient;
+    private AuthorizationService authorizationService;
     @MockBean
     private NotificationService notificationService;
 
@@ -72,28 +72,31 @@ class NotificationControllerSecurityTest extends AbstractSecurityTest {
     @BeforeEach
     void setupMocks() {
         doNothing().when(notificationService).editNotification(any());
-        Map<String, String> roleMap = Map.of(VALID_USER_ROLE, "CERTIFICATE_CREATOR", COVID_APP_MANAGER, "COVID_APP_MANAGER");
-        when(authorizationClient.requestRoleMap()).thenReturn(roleMap);
 
-        ServiceDataDto.Function getAllNotifications = createFunction("getAllNotifications", roleMap.get(VALID_USER_ROLE), List.of(HttpMethod.GET));
-        ServiceDataDto.Function writeNotifications = createFunction("writeNotifications", roleMap.get(COVID_APP_MANAGER), List.of(HttpMethod.POST));
-        ServiceDataDto.Function deleteNotifications = createFunction("deleteNotifications", roleMap.get(COVID_APP_MANAGER), List.of(HttpMethod.DELETE));
+        ServiceData.Function deleteNotifications = createFunction("deleteNotifications", "COVID_APP_MANAGER", List.of(HttpMethod.DELETE));
         deleteNotifications.setUri("/api/v1/notifications/{notificationId}");
+        when(authorizationService.identifyFunction(
+                eq(AuthorizationService.SERVICE_NOTIFICATIONS),
+                startsWith(URL), eq(HttpMethod.DELETE.name()))).thenReturn(List.of(deleteNotifications));
+        when(authorizationService.isGranted(Set.of(COVID_APP_MANAGER), deleteNotifications)).thenReturn(true);
 
-        HashMap<String, ServiceDataDto.Function> functions = new HashMap<>();
-        functions.put(getAllNotifications.getIdentifier(), getAllNotifications);
-        functions.put(writeNotifications.getIdentifier(), writeNotifications);
-        functions.put(deleteNotifications.getIdentifier(), deleteNotifications);
+        ServiceData.Function getAllNotifications = createFunction("getAllNotifications", "ANY_ROLE", List.of(HttpMethod.GET));
+        when(authorizationService.identifyFunction(
+                eq(AuthorizationService.SERVICE_NOTIFICATIONS),
+                startsWith(URL), eq(HttpMethod.GET.name()))).thenReturn(List.of(getAllNotifications));
+        when(authorizationService.isGranted(Set.of(VALID_USER_ROLE), getAllNotifications)).thenReturn(true);
 
-        ServiceDataDto serviceDataDto = new ServiceDataDto();
-        serviceDataDto.setFunctions(functions);
-        when(authorizationClient.requestServiceDefinition()).thenReturn(Optional.of(
-                serviceDataDto
-        ));
+        ServiceData.Function writeNotifications = createFunction("writeNotifications", COVID_APP_MANAGER, List.of(HttpMethod.POST));
+        when(authorizationService.identifyFunction(
+                eq(AuthorizationService.SERVICE_NOTIFICATIONS),
+                startsWith(URL), eq(HttpMethod.POST.name()))).thenReturn(List.of(writeNotifications));
+        when(authorizationService.isGranted(Set.of(COVID_APP_MANAGER), writeNotifications)).thenReturn(true);
+
+        when(authorizationService.isUserPermitted(Mockito.anyCollection())).thenReturn(true);
     }
 
-    private ServiceDataDto.Function createFunction(String identifier, String role, List<HttpMethod> methods) {
-        ServiceDataDto.Function function = new ServiceDataDto.Function();
+    private ServiceData.Function createFunction(String identifier, String role, List<HttpMethod> methods) {
+        ServiceData.Function function = new ServiceData.Function();
         function.setIdentifier(identifier);
         function.setFrom(LocalDateTime.MIN);
         function.setUntil(LocalDateTime.MAX);
@@ -252,7 +255,5 @@ class NotificationControllerSecurityTest extends AbstractSecurityTest {
                             .header("Authorization", "Bearer " + token))
                     .andExpect(getResultMatcher(status));
         }
-
-
     }
 }

@@ -117,9 +117,3 @@ cc-notification-service:
     prometheus:
       secure: true
 
-cc-management-service:
-  authorization:
-    api:
-      v1-path: "api/v1/authorization/"
-    data-sync:
-      cron: "0 0 0 * * *" ## Every day at midnight

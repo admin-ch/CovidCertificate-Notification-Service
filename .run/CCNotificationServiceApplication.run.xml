@@ -9,7 +9,7 @@
             </pattern>
         </extension>
         <option name="SPRING_BOOT_MAIN_CLASS" value="ch.admin.bag.covidcertificate.NotificationServiceApplication"/>
-        <option name="ACTIVE_PROFILES" value="local"/>
+        <option name="ACTIVE_PROFILES" value="local,authorization"/>
         <option name="ALTERNATIVE_JRE_PATH"/>
         <method v="2">
             <option name="Make" enabled="true"/>

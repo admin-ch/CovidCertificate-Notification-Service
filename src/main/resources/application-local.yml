@@ -29,8 +29,3 @@ cc-notification-service:
       password: "{noop}secret"
   allowed-origin: "*"
 
-cc-management-service:
-  uri: http://localhost:8120/
-  authorization:
-    data-sync:
-      cron: "0 * * * * *" ## Every minute

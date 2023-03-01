@@ -30,5 +30,3 @@ cc-notification-service:
   truststore:
     password: ${vcap.services.cc_trust_store.credentials.password}
 
-cc-management-service:
-  uri: "https://cc-management-service.abn.app.cfap02.atlantica.admin.ch/"
